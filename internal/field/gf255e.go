@@ -10,27 +10,36 @@ type GF255e [4]uint64
 const mq255e uint64 = 18651
 
 // Field element of value 0.
-var GF255e_ZERO = GF255e { 0, 0, 0, 0 }
+var GF255e_ZERO = GF255e{0, 0, 0, 0}
+
 // Field element of value 1.
-var GF255e_ONE = GF255e { 1, 0, 0, 0 }
+var GF255e_ONE = GF255e{1, 0, 0, 0}
+
 // Field element of value 3.
-var GF255e_THREE = GF255e { 3, 0, 0, 0 }
+var GF255e_THREE = GF255e{3, 0, 0, 0}
+
 // Field element of value 7.
-var GF255e_SEVEN = GF255e { 7, 0, 0, 0 }
+var GF255e_SEVEN = GF255e{7, 0, 0, 0}
+
 // Field element of value 8.
-var GF255e_EIGHT = GF255e { 8, 0, 0, 0 }
+var GF255e_EIGHT = GF255e{8, 0, 0, 0}
+
 // Field element of value 27.
-var GF255e_TWENTYSEVEN = GF255e { 27, 0, 0, 0 }
+var GF255e_TWENTYSEVEN = GF255e{27, 0, 0, 0}
+
 // Field element of value 176.
-var GF255e_HUNDREDSEVENTYSIX = GF255e { 176, 0, 0, 0 }
+var GF255e_HUNDREDSEVENTYSIX = GF255e{176, 0, 0, 0}
+
 // Field element of value 308.
-var GF255e_THREEHUNDREDEIGHT = GF255e { 308, 0, 0, 0 }
+var GF255e_THREEHUNDREDEIGHT = GF255e{308, 0, 0, 0}
+
 // Field element of value 343.
-var GF255e_THREEHUNDREDFORTYTHREE = GF255e { 343, 0, 0, 0 }
+var GF255e_THREEHUNDREDFORTYTHREE = GF255e{343, 0, 0, 0}
+
 // Field element of value 1/2^508 (used internally for inversions).
-var GF255e_INVT508 = GF255e {
+var GF255e_INVT508 = GF255e{
 	0xD40D5B5D2BE1CF5D, 0x3B3573987282DD51,
-	0x3ECCB22800EED6AE, 0x44F35C558E8FAC0B }
+	0x3ECCB22800EED6AE, 0x44F35C558E8FAC0B}
 
 // d <- a
 func (d *GF255e) Set(a *GF255e) *GF255e {
@@ -216,14 +225,14 @@ func (d *GF255e) Sqrt(a *GF255e) uint64 {
 	// Verify the result. If not square, then set the result to 0.
 	gf_sqr(&y, &x, mq255e)
 	qr := gf_eq(&y, (*[4]uint64)(a), mq255e)
-	for i := 0; i < 4; i ++ {
+	for i := 0; i < 4; i++ {
 		x[i] &= -qr
 	}
 
 	// Normalize the result, and negate the value if the least
 	// significant bit is 1.
 	gf_norm(&x, &x, mq255e)
-	gf_condneg(&x, &x, mq255e, x[0] & 1)
+	gf_condneg(&x, &x, mq255e, x[0]&1)
 
 	// Return the result.
 	copy(d[:], x[:])

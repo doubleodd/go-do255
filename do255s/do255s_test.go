@@ -1,13 +1,13 @@
 package do255s
 
 import (
-	"testing"
-	"encoding/hex"
 	"bytes"
+	"encoding/hex"
+	"testing"
 )
 
 func TestDo255sDecode(t *testing.T) {
-	for i := 0; i < len(kat_DO255S_DECODE_OK); i ++ {
+	for i := 0; i < len(kat_DO255S_DECODE_OK); i++ {
 		bb, _ := hex.DecodeString(kat_DO255S_DECODE_OK[i])
 		rc := Do255sCheckPoint(bb)
 		var P Do255sPoint
@@ -32,7 +32,7 @@ func TestDo255sDecode(t *testing.T) {
 
 	bzz := do255sNeutral.Bytes()
 
-	for i := 0; i < len(kat_DO255S_DECODE_BAD); i ++ {
+	for i := 0; i < len(kat_DO255S_DECODE_BAD); i++ {
 		bb, _ := hex.DecodeString(kat_DO255S_DECODE_BAD[i])
 		rc := Do255sCheckPoint(bb)
 		if rc != -1 {
@@ -54,7 +54,7 @@ func TestDo255sDecode(t *testing.T) {
 func TestDo255sMapBytes(t *testing.T) {
 	for i := 0; i < len(kat_DO255S_POINT_MAP); i += 2 {
 		bb1, _ := hex.DecodeString(kat_DO255S_POINT_MAP[i])
-		bb2, _ := hex.DecodeString(kat_DO255S_POINT_MAP[i + 1])
+		bb2, _ := hex.DecodeString(kat_DO255S_POINT_MAP[i+1])
 		var P Do255sPoint
 		P.MapBytes(bb1)
 		bb3 := P.Bytes()
@@ -68,11 +68,11 @@ func TestDo255sPointAdd(t *testing.T) {
 	for i := 0; i < len(kat_DO255S_POINT_ADD); i += 6 {
 		var P1, P2, P3, P4, P5, P6 Do255sPoint
 		bb1, _ := hex.DecodeString(kat_DO255S_POINT_ADD[i])
-		bb2, _ := hex.DecodeString(kat_DO255S_POINT_ADD[i + 1])
-		bb3, _ := hex.DecodeString(kat_DO255S_POINT_ADD[i + 2])
-		bb4, _ := hex.DecodeString(kat_DO255S_POINT_ADD[i + 3])
-		bb5, _ := hex.DecodeString(kat_DO255S_POINT_ADD[i + 4])
-		bb6, _ := hex.DecodeString(kat_DO255S_POINT_ADD[i + 5])
+		bb2, _ := hex.DecodeString(kat_DO255S_POINT_ADD[i+1])
+		bb3, _ := hex.DecodeString(kat_DO255S_POINT_ADD[i+2])
+		bb4, _ := hex.DecodeString(kat_DO255S_POINT_ADD[i+3])
+		bb5, _ := hex.DecodeString(kat_DO255S_POINT_ADD[i+4])
+		bb6, _ := hex.DecodeString(kat_DO255S_POINT_ADD[i+5])
 		P1.Decode(bb1)
 		P2.Decode(bb2)
 		P3.Decode(bb3)
@@ -174,11 +174,11 @@ func TestDo255sPointAdd(t *testing.T) {
 
 		// Testing sequences of doublings.
 		var Q10, Q11 Do255sPoint
-		for j := 0; j < 10; j ++ {
+		for j := 0; j < 10; j++ {
 			Q10.Generator()
 			Q10.DoubleX(&Q6, uint(j))
 			Q11.Set(&Q6)
-			for k := 0; k < j; k ++ {
+			for k := 0; k < j; k++ {
 				Q11.Double(&Q11)
 			}
 			if Q10.Equal(&Q11) == 0 {
@@ -193,8 +193,8 @@ func TestDo255sPointMul(t *testing.T) {
 		var P1, P2, P3 Do255sPoint
 		var n Do255sScalar
 		bb1, _ := hex.DecodeString(kat_DO255S_POINT_MUL[i])
-		bb2, _ := hex.DecodeString(kat_DO255S_POINT_MUL[i + 1])
-		bb3, _ := hex.DecodeString(kat_DO255S_POINT_MUL[i + 2])
+		bb2, _ := hex.DecodeString(kat_DO255S_POINT_MUL[i+1])
+		bb3, _ := hex.DecodeString(kat_DO255S_POINT_MUL[i+2])
 		P1.Decode(bb1)
 		n.DecodeReduce(bb2)
 		P2.Decode(bb3)
@@ -206,7 +206,7 @@ func TestDo255sPointMul(t *testing.T) {
 
 	var rng prng
 	rng.init("test mulgen do255s")
-	for i := 0; i < 1000; i ++ {
+	for i := 0; i < 1000; i++ {
 		var n Do255sScalar
 		if i == 0 {
 			n[0] = 0
@@ -227,8 +227,8 @@ func TestDo255sPointMul(t *testing.T) {
 	bb, _ := hex.DecodeString(kat_DO255S_MC_POINT_MUL[0])
 	var P Do255sPoint
 	P.Decode(bb)
-	for i := 1; i < len(kat_DO255S_MC_POINT_MUL); i ++ {
-		for j := 0; j < 1000; j ++ {
+	for i := 1; i < len(kat_DO255S_MC_POINT_MUL); i++ {
+		for j := 0; j < 1000; j++ {
 			var n Do255sScalar
 			n.DecodeReduce(bb)
 			P.Mul(&P, &n)
@@ -245,7 +245,7 @@ func TestDo255sPointMul(t *testing.T) {
 func TestDo255sVerifyHelper(t *testing.T) {
 	var rng prng
 	rng.init("test verify helper do255s")
-	for i := 0; i < 1000; i ++ {
+	for i := 0; i < 1000; i++ {
 		var n, k0, k1 Do255sScalar
 
 		rng.mk256((*[4]uint64)(&n))
@@ -314,7 +314,7 @@ func BenchmarkMul255s(b *testing.B) {
 	bb, _ = hex.DecodeString("81d3066b23528ff3728a200ae411d815ba612b45c2556fa1000cb665de692a73")
 	s.DecodeReduce(bb)
 	b.ResetTimer()
-	for i := 0; i < b.N; i ++ {
+	for i := 0; i < b.N; i++ {
 		P.Mul(&P, &s)
 	}
 }
@@ -325,7 +325,7 @@ func BenchmarkMulGen255s(b *testing.B) {
 	bb, _ := hex.DecodeString("81d3066b23528ff3728a200ae411d815ba612b45c2556fa1000cb665de692a73")
 	s.DecodeReduce(bb)
 	b.ResetTimer()
-	for i := 0; i < b.N; i ++ {
+	for i := 0; i < b.N; i++ {
 		P.MulGen(&s)
 	}
 }
@@ -338,7 +338,7 @@ func BenchmarkVerify255s(b *testing.B) {
 	rng.mk256((*[4]uint64)(&k0))
 	rng.mk256((*[4]uint64)(&k1))
 	b.ResetTimer()
-	for i := 0; i < b.N; i ++ {
+	for i := 0; i < b.N; i++ {
 		do255sGenerator.VerifyHelper(&k0, &k1, encR[:])
 	}
 }
@@ -348,15 +348,15 @@ func BenchmarkVerifyVartime255s(b *testing.B) {
 	var rng prng
 	rng.init("bench verify do255s")
 	var k0, k1 [100]Do255sScalar
-	for i := 0; i < len(k0); i ++ {
+	for i := 0; i < len(k0); i++ {
 		rng.mk256((*[4]uint64)(&k0[i]))
 		rng.mk256((*[4]uint64)(&k1[i]))
 	}
 	b.ResetTimer()
 	j := 0
-	for i := 0; i < b.N; i ++ {
+	for i := 0; i < b.N; i++ {
 		do255sGenerator.VerifyHelperVartime(&k0[j], &k1[j], encR[:])
-		j ++
+		j++
 		if j >= len(k0) {
 			j = 0
 		}
@@ -367,15 +367,15 @@ func BenchmarkLagrange255s(b *testing.B) {
 	var rng prng
 	rng.init("bench Lagrange do255s")
 	var k [100]Do255sScalar
-	for i := 0; i < len(k); i ++ {
+	for i := 0; i < len(k); i++ {
 		rng.mk256((*[4]uint64)(&k[i]))
 	}
 	b.ResetTimer()
 	j := 0
-	for i := 0; i < b.N; i ++ {
+	for i := 0; i < b.N; i++ {
 		var c0, c1 [2]uint64
 		k[j].ReduceBasisVartime(&c0, &c1)
-		j ++
+		j++
 		if j >= len(k) {
 			j = 0
 		}
@@ -383,7 +383,7 @@ func BenchmarkLagrange255s(b *testing.B) {
 }
 
 // Strings that decode to valid points.
-var kat_DO255S_DECODE_OK = []string {
+var kat_DO255S_DECODE_OK = []string{
 	"0000000000000000000000000000000000000000000000000000000000000000",
 	"c591e486e9f0f87589ba486b51629c358cddf4bd8c50db5c53d5631a3f785074",
 	"3280b9a23784102fb56338df91bc417efa9d04a4718a36a55552d0e55a8d6a25",
@@ -408,7 +408,7 @@ var kat_DO255S_DECODE_OK = []string {
 }
 
 // Strings that do not decode to valid points.
-var kat_DO255S_DECODE_BAD = []string {
+var kat_DO255S_DECODE_BAD = []string{
 	// These values cannot be decoded (w is out of range).
 	"3a92541c88f5ca5620985ec23400c1149969685ff403f9ff8fa63349a9f518a9",
 	"7dcebc2ba5e16650eef4f69d4fb444786858d42576e2fcbb867938df7451e4c6",
@@ -455,7 +455,7 @@ var kat_DO255S_DECODE_BAD = []string {
 }
 
 // Mapping of bytes to points.
-var kat_DO255S_POINT_MAP = []string {
+var kat_DO255S_POINT_MAP = []string{
 	// Map-to-curve test vectors for Do255s
 	// Each group of two values is: input bytes, mapped point
 	"0100000000000000000000000000000000000000000000000000000000000000",
@@ -584,7 +584,7 @@ var kat_DO255S_POINT_MAP = []string {
 //   P4 = 2*P1
 //   P5 = P4 + P2 = P3 + P1
 //   P6 = P5 + P2 = P4 + 2*P2
-var kat_DO255S_POINT_ADD = []string {
+var kat_DO255S_POINT_ADD = []string{
 	"a640cf808233d9ba7d04df6eb7f79bfca282e16788a06268458a23a67c786915",
 	"6227d95a323ef8dcec8f963ee75b0c3610aaa85eb141eaf0c9351c3bb7614357",
 	"3e662bf0ac88715ece7ae60455d8e3cd62ad6015eb15f3e9bfb1affa13ff0e2a",
@@ -728,7 +728,7 @@ var kat_DO255S_POINT_ADD = []string {
 
 // Point multiplication tests. Each group of 3 strings is: P, n, n*P
 // Scalar n is not reduced modulo r.
-var kat_DO255S_POINT_MUL = []string {
+var kat_DO255S_POINT_MUL = []string{
 	"5dc536d2997635a8a3bbff585cebccb8b05f4689535d464a687daf26b0a85e50",
 	"ee5f3f239a06a05bb113cd4f568e4f85ec3a6fd7f394b0d35c30af7ef25cb088",
 	"294d9711c65e9d92d6a461390c74af1e6736d9eb1beab7956c95c5f93f7b0016",
@@ -810,7 +810,7 @@ var kat_DO255S_POINT_MUL = []string {
 	"b9263ce912675c3602b6941f735610bd1ea46749b9f8f86af48adb203d631b6d",
 }
 
-var kat_DO255S_MC_POINT_MUL = []string {
+var kat_DO255S_MC_POINT_MUL = []string{
 	"a90da7dccc5a50916e7ce76e8292ddb9722a8bc210fb1a71258c50ea17e15722",
 
 	"ae754a06df209494ece70bcffb24f0f4ddcd89c2674ddf9965d7ee14f69e4978",

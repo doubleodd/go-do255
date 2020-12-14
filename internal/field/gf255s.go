@@ -10,15 +10,18 @@ type GF255s [4]uint64
 const mq255s uint64 = 3957
 
 // Field element of value 0.
-var GF255s_ZERO = GF255s { 0, 0, 0, 0 }
+var GF255s_ZERO = GF255s{0, 0, 0, 0}
+
 // Field element of value 1.
-var GF255s_ONE = GF255s { 1, 0, 0, 0 }
+var GF255s_ONE = GF255s{1, 0, 0, 0}
+
 // Field element of value 2.
-var GF255s_TWO = GF255s { 2, 0, 0, 0 }
+var GF255s_TWO = GF255s{2, 0, 0, 0}
+
 // Field element of value 1/2^508 (used internally for inversions).
-var GF255s_INVT508 = GF255s {
+var GF255s_INVT508 = GF255s{
 	0xC7E0DEC400D7BDB6, 0xCCABD4771F6FB10F,
-	0x940F23A06B74BE6E, 0x1C45852F33548365 }
+	0x940F23A06B74BE6E, 0x1C45852F33548365}
 
 // d <- a
 func (d *GF255s) Set(a *GF255s) *GF255s {
@@ -180,14 +183,14 @@ func (d *GF255s) Sqrt(a *GF255s) uint64 {
 	// Verify the result. If not square, then set the result to 0.
 	gf_sqr(&y, &x, mq255s)
 	qr := gf_eq(&y, (*[4]uint64)(a), mq255s)
-	for i := 0; i < 4; i ++ {
+	for i := 0; i < 4; i++ {
 		x[i] &= -qr
 	}
 
 	// Normalize the result, and negate the value if the least
 	// significant bit is 1.
 	gf_norm(&x, &x, mq255s)
-	gf_condneg(&x, &x, mq255s, x[0] & 1)
+	gf_condneg(&x, &x, mq255s, x[0]&1)
 
 	// Return the result.
 	copy(d[:], x[:])

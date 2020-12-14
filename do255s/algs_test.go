@@ -1,17 +1,17 @@
 package do255s
 
 import (
-	"testing"
 	"bytes"
 	"crypto"
 	"encoding/hex"
 	"golang.org/x/crypto/sha3"
+	"testing"
 )
 
 func TestDo255sKeyGen(t *testing.T) {
-	for i := 0; (2 * i) < len(kat_DO255S_KEYGEN); i ++ {
-		rsk, _ := hex.DecodeString(kat_DO255S_KEYGEN[2 * i])
-		rpk, _ := hex.DecodeString(kat_DO255S_KEYGEN[2 * i + 1])
+	for i := 0; (2 * i) < len(kat_DO255S_KEYGEN); i++ {
+		rsk, _ := hex.DecodeString(kat_DO255S_KEYGEN[2*i])
+		rpk, _ := hex.DecodeString(kat_DO255S_KEYGEN[2*i+1])
 		sh := sha3.NewShake256()
 		var bb [1]byte
 		bb[0] = byte(i)
@@ -31,10 +31,10 @@ func TestDo255sKeyGen(t *testing.T) {
 func TestDo255sECDH(t *testing.T) {
 	for i := 0; i < len(kat_DO255S_ECDH); i += 5 {
 		rsk, _ := hex.DecodeString(kat_DO255S_ECDH[i])
-		rppk1, _ := hex.DecodeString(kat_DO255S_ECDH[i + 1])
-		rsec1, _ := hex.DecodeString(kat_DO255S_ECDH[i + 2])
-		rppk2, _ := hex.DecodeString(kat_DO255S_ECDH[i + 3])
-		rsec2, _ := hex.DecodeString(kat_DO255S_ECDH[i + 4])
+		rppk1, _ := hex.DecodeString(kat_DO255S_ECDH[i+1])
+		rsec1, _ := hex.DecodeString(kat_DO255S_ECDH[i+2])
+		rppk2, _ := hex.DecodeString(kat_DO255S_ECDH[i+3])
+		rsec2, _ := hex.DecodeString(kat_DO255S_ECDH[i+4])
 
 		sk, _ := Do255sDecodePrivateKey(rsk)
 
@@ -59,10 +59,10 @@ func TestDo255sECDH(t *testing.T) {
 func TestDo255sSign(t *testing.T) {
 	for i := 0; i < len(kat_DO255S_SIGN); i += 5 {
 		rsk, _ := hex.DecodeString(kat_DO255S_SIGN[i])
-		rpk, _ := hex.DecodeString(kat_DO255S_SIGN[i + 1])
-		seed, _ := hex.DecodeString(kat_DO255S_SIGN[i + 2])
-		data, _ := hex.DecodeString(kat_DO255S_SIGN[i + 3])
-		rsig, _ := hex.DecodeString(kat_DO255S_SIGN[i + 4])
+		rpk, _ := hex.DecodeString(kat_DO255S_SIGN[i+1])
+		seed, _ := hex.DecodeString(kat_DO255S_SIGN[i+2])
+		data, _ := hex.DecodeString(kat_DO255S_SIGN[i+3])
+		rsig, _ := hex.DecodeString(kat_DO255S_SIGN[i+4])
 
 		sk, _ := Do255sDecodePrivateKey(rsk)
 		pk := sk.Public()
@@ -89,10 +89,10 @@ func TestDo255sSign(t *testing.T) {
 
 func TestDo255sHashToCurve(t *testing.T) {
 	var src [100]byte
-	for i := 0; i < len(src); i ++ {
+	for i := 0; i < len(src); i++ {
 		src[i] = byte(i)
 	}
-	for i := 0; i < len(kat_DO255S_HASHTOCURVE); i ++ {
+	for i := 0; i < len(kat_DO255S_HASHTOCURVE); i++ {
 		rp, _ := hex.DecodeString(kat_DO255S_HASHTOCURVE[i])
 
 		P, err := Do255sHashToCurve(src[:i], crypto.Hash(0))
@@ -109,7 +109,7 @@ func TestDo255sHashToCurve(t *testing.T) {
 // Keygen tests.
 // For i in 0..19, keygen with SHAKE256((byte)i) as source.
 // Each group of two values is the private/public key pair.
-var kat_DO255S_KEYGEN = []string {
+var kat_DO255S_KEYGEN = []string{
 	"f17dbcbef04a157b7e470b6563940017e5de0bbf30042ef0a86e36f4b8600d14",
 	"07e4009d918a6c56f5a65896a8720ae26d4beeefcf67acd236886ca5475a1219",
 
@@ -178,7 +178,7 @@ var kat_DO255S_KEYGEN = []string {
 //   secret from ECDH with valid peer point
 //   public peer point (invalid)
 //   secret from ECDH with invalid peer point
-var kat_DO255S_ECDH = []string {
+var kat_DO255S_ECDH = []string{
 	"0b60d9af0d907ad367c24916a2a5a7304d91627c062995a4247952fb90a67e07",
 	"d642ebc9d2c25d04dd4f5a2b2fec9bb113c4a5e7cf18f133012a9ecc0c34805d",
 	"496dc32968fa89024ccbbfa52a0fee974e5046dfdc61ea8b4c818e73e3bddf25",
@@ -307,7 +307,7 @@ var kat_DO255S_ECDH = []string {
 //   seed (can be empty!)
 //   data (SHA3-256 of "sample X" with X = 0, 1,...)
 //   signature
-var kat_DO255S_SIGN = []string {
+var kat_DO255S_SIGN = []string{
 	"e7c1f12f0f7000d7f67a5a5c8d6a14700fba7a69d530c935c68105109ddce608",
 	"e5a5789fe4447b6de68259cb8916a29d92b11bf817d51ba4423305c1ca22497d",
 	"",
@@ -432,7 +432,7 @@ var kat_DO255S_SIGN = []string {
 // Hash-to-curve tests for Do255s
 // For i = 0..99, hash-to-curve using as data the first i bytes
 // of the sequence 00 01 02 03 .. 62  (raw data, no hash function)
-var kat_DO255S_HASHTOCURVE = []string {
+var kat_DO255S_HASHTOCURVE = []string{
 	"8c35143563bb29d47d0d6ec499f7a87c7d10d17884d238b36c853bb8c185fe60",
 	"59576551095a30f97af32498b5a0e6c186d8ed6fac7b3e6def5065ad3d26646c",
 	"6724b037c9c1c71c486ed00623188c3bec884d7f97c0c7d0c54332b173610d20",

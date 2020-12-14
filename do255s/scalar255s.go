@@ -1,8 +1,8 @@
 package do255s
 
 import (
-	"math/bits"
 	"github.com/doubleodd/go-do255/internal/scalar"
+	"math/bits"
 )
 
 // This file defines types and functions for do255e scalars, i.e.
@@ -77,7 +77,7 @@ func (s *Do255sScalar) Sub(a, b *Do255sScalar) *Do255sScalar {
 // Scalar negation: s is set to -a (mod r).
 // A pointer to s is returned.
 func (s *Do255sScalar) Neg(a *Do255sScalar) *Do255sScalar {
-	var t = [4]uint64 { 0, 0, 0, 0 }
+	var t = [4]uint64{0, 0, 0, 0}
 	scalar.Sub((*[4]uint64)(s), &t, (*[4]uint64)(a), do255sModrReduce256Partial, &do255sOrder)
 	return s
 }
@@ -98,9 +98,9 @@ const do255s_r_top uint64 = 0x4000000000000000
 const do255s_r0x4_lo uint64 = 0x73CAB194E5854B1C
 const do255s_r0x4_hi uint64 = 0xAB3D59EA44ADFC0F
 
-var do255sOrder = [4]uint64 { do255s_r0_lo, do255s_r0_hi, 0, do255s_r_top }
+var do255sOrder = [4]uint64{do255s_r0_lo, do255s_r0_hi, 0, do255s_r_top}
 
-var do255s_r2 = [8]uint64 {
+var do255s_r2 = [8]uint64{
 	0xA31F34E2739216B1, 0x86A297C9835B5211,
 	0x95DCE66BF04303AD, 0x8728B04D2F0F9E3C,
 	0xEE7956329CB0A963, 0x1567AB3D4895BF81,
@@ -125,14 +125,14 @@ func do255sModrReduce256PartialWithExtra(d, a *[4]uint64, ah uint64) {
 	d[0], cc = bits.Sub64(a[0], u0, 0)
 	d[1], cc = bits.Sub64(a[1], u1, cc)
 	d[2], cc = bits.Sub64(a[2], u2, cc)
-	d[3], cc = bits.Sub64(a[3] & 0x3FFFFFFFFFFFFFFF, 0, cc)
+	d[3], cc = bits.Sub64(a[3]&0x3FFFFFFFFFFFFFFF, 0, cc)
 
 	// If we got a borrow, then we must add back r. Since ah*r0 < 2^192,
 	// the result will be nonnegative, but less than r.
 	m := -cc
-	d[0], cc = bits.Add64(d[0], m & do255sOrder[0], 0)
-	d[1], cc = bits.Add64(d[1], m & do255sOrder[1], cc)
-	d[2], cc = bits.Add64(d[2], m & do255sOrder[2], cc)
+	d[0], cc = bits.Add64(d[0], m&do255sOrder[0], 0)
+	d[1], cc = bits.Add64(d[1], m&do255sOrder[1], cc)
+	d[2], cc = bits.Add64(d[2], m&do255sOrder[2], cc)
 	d[3] = d[3] + (m & do255sOrder[3]) + cc
 }
 
@@ -156,7 +156,7 @@ func do255sModrReduce256Finish(d, a *[4]uint64) {
 	// If the result is nonnegative, then keep it; otherwise, use the
 	// original value.
 	m := -cc
-	for i := 0; i < 4; i ++ {
+	for i := 0; i < 4; i++ {
 		d[i] = t[i] ^ (m & (a[i] ^ t[i]))
 	}
 }
@@ -202,7 +202,7 @@ func do255sModrReduce384Partial(d *[4]uint64, a *[6]uint64) {
 // a < b, false otherwise.
 // THIS IS NOT CONSTANT-TIME.
 func cmp512ltVartime(a, b *[8]uint64) bool {
-	for i := 7; i >= 0; i -- {
+	for i := 7; i >= 0; i-- {
 		if a[i] < b[i] {
 			return true
 		}
@@ -217,7 +217,7 @@ func cmp512ltVartime(a, b *[8]uint64) bool {
 // THIS IS NOT CONSTANT-TIME.
 func bitlength512Vartime(a *[8]uint64) int {
 	m := -(a[7] >> 63)
-	for i := 7; i >= 0; i -- {
+	for i := 7; i >= 0; i-- {
 		aw := a[i] ^ m
 		if aw != 0 {
 			return (i << 6) + 64 - bits.LeadingZeros64(aw)
@@ -238,8 +238,8 @@ func addLshift192Vartime(d, a *[3]uint64, s int) {
 		} else {
 			var t [3]uint64
 			t[0] = a[0] << uint(s)
-			t[1] = (a[1] << uint(s)) | (a[0] >> uint(64 - s))
-			t[2] = (a[2] << uint(s)) | (a[1] >> uint(64 - s))
+			t[1] = (a[1] << uint(s)) | (a[0] >> uint(64-s))
+			t[2] = (a[2] << uint(s)) | (a[1] >> uint(64-s))
 			var cc uint64
 			d[0], cc = bits.Add64(d[0], t[0], 0)
 			d[1], cc = bits.Add64(d[1], t[1], cc)
@@ -261,13 +261,13 @@ func addLshift192Vartime(d, a *[3]uint64, s int) {
 			return
 		} else {
 			if s < 128 {
-				a0 := a[0] << uint(s - 64)
-				a1 := (a[1] << uint(s - 64)) | (a[0] >> uint(128 - s))
+				a0 := a[0] << uint(s-64)
+				a1 := (a[1] << uint(s-64)) | (a[0] >> uint(128-s))
 				var cc uint64
 				d[1], cc = bits.Add64(d[1], a0, 0)
 				d[2], _ = bits.Add64(d[2], a1, cc)
 			} else {
-				d[2] += a[0] << uint(s - 128)
+				d[2] += a[0] << uint(s-128)
 			}
 		}
 	}
@@ -285,8 +285,8 @@ func subLshift192Vartime(d, a *[3]uint64, s int) {
 		} else {
 			var t [3]uint64
 			t[0] = a[0] << uint(s)
-			t[1] = (a[1] << uint(s)) | (a[0] >> uint(64 - s))
-			t[2] = (a[2] << uint(s)) | (a[1] >> uint(64 - s))
+			t[1] = (a[1] << uint(s)) | (a[0] >> uint(64-s))
+			t[2] = (a[2] << uint(s)) | (a[1] >> uint(64-s))
 			var cc uint64
 			d[0], cc = bits.Sub64(d[0], t[0], 0)
 			d[1], cc = bits.Sub64(d[1], t[1], cc)
@@ -308,13 +308,13 @@ func subLshift192Vartime(d, a *[3]uint64, s int) {
 			return
 		} else {
 			if s < 128 {
-				a0 := a[0] << uint(s - 64)
-				a1 := (a[1] << uint(s - 64)) | (a[0] >> uint(128 - s))
+				a0 := a[0] << uint(s-64)
+				a1 := (a[1] << uint(s-64)) | (a[0] >> uint(128-s))
 				var cc uint64
 				d[1], cc = bits.Sub64(d[1], a0, 0)
 				d[2], _ = bits.Sub64(d[2], a1, cc)
 			} else {
-				d[2] -= a[0] << uint(s - 128)
+				d[2] -= a[0] << uint(s-128)
 			}
 		}
 	}
@@ -326,17 +326,17 @@ func addLshift512Vartime(d, a *[8]uint64, s int) {
 	if s < 64 {
 		if s == 0 {
 			var cc uint64 = 0
-			for i := 0; i < 8; i ++ {
+			for i := 0; i < 8; i++ {
 				d[i], cc = bits.Add64(d[i], a[i], cc)
 			}
 		} else {
 			var t [8]uint64
 			t[0] = a[0] << uint(s)
-			for i := 1; i < 8; i ++ {
-				t[i] = (a[i] << uint(s)) | (a[i - 1] >> uint(64 - s))
+			for i := 1; i < 8; i++ {
+				t[i] = (a[i] << uint(s)) | (a[i-1] >> uint(64-s))
 			}
 			var cc uint64 = 0
-			for i := 0; i < 8; i ++ {
+			for i := 0; i < 8; i++ {
 				d[i], cc = bits.Add64(d[i], t[i], cc)
 			}
 		}
@@ -349,17 +349,17 @@ func addLshift512Vartime(d, a *[8]uint64, s int) {
 		s &= 63
 		var t [8]uint64
 		if s == 0 {
-			for i := j; i < 8; i ++ {
-				t[i] = a[i - j]
+			for i := j; i < 8; i++ {
+				t[i] = a[i-j]
 			}
 		} else {
 			t[j] = a[0] << uint(s)
-			for i := j + 1; i < 8; i ++ {
-				t[i] = (a[i - j] << uint(s)) | (a[i - j - 1] >> uint(64 - s))
+			for i := j + 1; i < 8; i++ {
+				t[i] = (a[i-j] << uint(s)) | (a[i-j-1] >> uint(64-s))
 			}
 		}
 		var cc uint64 = 0
-		for i := j; i < 8; i ++ {
+		for i := j; i < 8; i++ {
 			d[i], cc = bits.Add64(d[i], t[i], cc)
 		}
 	}
@@ -371,17 +371,17 @@ func subLshift512Vartime(d, a *[8]uint64, s int) {
 	if s < 64 {
 		if s == 0 {
 			var cc uint64 = 0
-			for i := 0; i < 8; i ++ {
+			for i := 0; i < 8; i++ {
 				d[i], cc = bits.Sub64(d[i], a[i], cc)
 			}
 		} else {
 			var t [8]uint64
 			t[0] = a[0] << uint(s)
-			for i := 1; i < 8; i ++ {
-				t[i] = (a[i] << uint(s)) | (a[i - 1] >> uint(64 - s))
+			for i := 1; i < 8; i++ {
+				t[i] = (a[i] << uint(s)) | (a[i-1] >> uint(64-s))
 			}
 			var cc uint64 = 0
-			for i := 0; i < 8; i ++ {
+			for i := 0; i < 8; i++ {
 				d[i], cc = bits.Sub64(d[i], t[i], cc)
 			}
 		}
@@ -394,17 +394,17 @@ func subLshift512Vartime(d, a *[8]uint64, s int) {
 		s &= 63
 		var t [8]uint64
 		if s == 0 {
-			for i := j; i < 8; i ++ {
-				t[i] = a[i - j]
+			for i := j; i < 8; i++ {
+				t[i] = a[i-j]
 			}
 		} else {
 			t[j] = a[0] << uint(s)
-			for i := j + 1; i < 8; i ++ {
-				t[i] = (a[i - j] << uint(s)) | (a[i - j - 1] >> uint(64 - s))
+			for i := j + 1; i < 8; i++ {
+				t[i] = (a[i-j] << uint(s)) | (a[i-j-1] >> uint(64-s))
 			}
 		}
 		var cc uint64 = 0
-		for i := j; i < 8; i ++ {
+		for i := j; i < 8; i++ {
 			d[i], cc = bits.Sub64(d[i], t[i], cc)
 		}
 	}
@@ -464,7 +464,7 @@ func (k *Do255sScalar) ReduceBasisVartime(c0, c1 *[2]uint64) (negc0 bool, negc1 
 	var nv [8]uint64
 	scalar.Mul256x256(&nv, &vk, &vk)
 	var cc uint64 = 1
-	for i := 0; i < 8; i ++ {
+	for i := 0; i < 8; i++ {
 		nv[i], cc = bits.Add64(nv[i], 0, cc)
 	}
 
@@ -476,7 +476,7 @@ func (k *Do255sScalar) ReduceBasisVartime(c0, c1 *[2]uint64) (negc0 bool, negc1 
 	for {
 		// If nu < nv, then swap(u,v) and swap(nu,nv)
 		if cmp512ltVartime(&nu, &nv) {
-			for i := 0; i < 3; i ++ {
+			for i := 0; i < 3; i++ {
 				tt := u0[i]
 				u0[i] = v0[i]
 				v0[i] = tt
@@ -484,7 +484,7 @@ func (k *Do255sScalar) ReduceBasisVartime(c0, c1 *[2]uint64) (negc0 bool, negc1 
 				u1[i] = v1[i]
 				v1[i] = tt
 			}
-			for i := 0; i < 8; i ++ {
+			for i := 0; i < 8; i++ {
 				tt := nu[i]
 				nu[i] = nv[i]
 				nv[i] = tt
@@ -531,14 +531,14 @@ func (k *Do255sScalar) ReduceBasisVartime(c0, c1 *[2]uint64) (negc0 bool, negc1 
 		if (sp[7] >> 63) == 0 {
 			subLshift192Vartime(&u0, &v0, s)
 			subLshift192Vartime(&u1, &v1, s)
-			addLshift512Vartime(&nu, &nv, 2 * s)
-			subLshift512Vartime(&nu, &sp, s + 1)
+			addLshift512Vartime(&nu, &nv, 2*s)
+			subLshift512Vartime(&nu, &sp, s+1)
 			subLshift512Vartime(&sp, &nv, s)
 		} else {
 			addLshift192Vartime(&u0, &v0, s)
 			addLshift192Vartime(&u1, &v1, s)
-			addLshift512Vartime(&nu, &nv, 2 * s)
-			addLshift512Vartime(&nu, &sp, s + 1)
+			addLshift512Vartime(&nu, &nv, 2*s)
+			addLshift512Vartime(&nu, &sp, s+1)
 			addLshift512Vartime(&sp, &nv, s)
 		}
 	}

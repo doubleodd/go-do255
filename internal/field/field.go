@@ -1,8 +1,8 @@
 package field
 
 import (
-	"math/bits"
 	"encoding/binary"
+	"math/bits"
 )
 
 // This file implements computations on some finite fields of integers
@@ -36,14 +36,14 @@ import (
 func gf_add(d, a, b *[4]uint64, mq uint64) {
 	// First pass: sum over 256 bits + carry
 	var cc uint64 = 0
-	for i := 0; i < 4; i ++ {
+	for i := 0; i < 4; i++ {
 		d[i], cc = bits.Add64(a[i], b[i], cc)
 	}
 
 	// Second pass: if there is a carry, subtract 2*p = 2^256 - 2*mq;
 	// i.e. we add 2*mq.
-	d[0], cc = bits.Add64(d[0], (mq << 1) & -cc, 0)
-	for i := 1; i < 4; i ++ {
+	d[0], cc = bits.Add64(d[0], (mq<<1)&-cc, 0)
+	for i := 1; i < 4; i++ {
 		d[i], cc = bits.Add64(d[i], 0, cc)
 	}
 
@@ -63,14 +63,14 @@ func gf_add(d, a, b *[4]uint64, mq uint64) {
 func gf_sub(d, a, b *[4]uint64, mq uint64) {
 	// First pass: difference over 256 bits + borrow
 	var cc uint64 = 0
-	for i := 0; i < 4; i ++ {
+	for i := 0; i < 4; i++ {
 		d[i], cc = bits.Sub64(a[i], b[i], cc)
 	}
 
 	// Second pass: if there is a borrow, add 2*p = 2^256 - 2*mq;
 	// i.e. we subtract 2*mq.
-	d[0], cc = bits.Sub64(d[0], (mq << 1) & -cc, 0)
-	for i := 1; i < 4; i ++ {
+	d[0], cc = bits.Sub64(d[0], (mq<<1)&-cc, 0)
+	for i := 1; i < 4; i++ {
 		d[i], cc = bits.Sub64(d[i], 0, cc)
 	}
 
@@ -90,17 +90,17 @@ func gf_neg(d, a *[4]uint64, mq uint64) {
 	// First pass: compute 2*p - a over 256 bits.
 	var cc uint64
 	d[0], cc = bits.Sub64(-(mq << 1), a[0], 0)
-	for i := 1; i < 4; i ++ {
+	for i := 1; i < 4; i++ {
 		d[i], cc = bits.Sub64(0xFFFFFFFFFFFFFFFF, a[i], cc)
 	}
 
 	// Second pass: if there is a borrow, add back p = 2^255 - mq.
 	var e uint64 = -cc
-	d[0], cc = bits.Add64(d[0], e & -mq, 0)
-	for i := 1; i < 3; i ++ {
+	d[0], cc = bits.Add64(d[0], e&-mq, 0)
+	for i := 1; i < 3; i++ {
 		d[i], cc = bits.Add64(d[i], e, cc)
 	}
-	d[3], _ = bits.Add64(d[3], e >> 1, cc)
+	d[3], _ = bits.Add64(d[3], e>>1, cc)
 }
 
 // Internal function for constant-time selection. Output d is set to
@@ -115,7 +115,7 @@ func gf_neg(d, a *[4]uint64, mq uint64) {
 func gf_select(d, a, b *[4]uint64, ctl uint64) {
 	ma := -ctl
 	mb := ^ma
-	for i := 0; i < 4; i ++ {
+	for i := 0; i < 4; i++ {
 		d[i] = (a[i] & ma) | (b[i] & mb)
 	}
 }
@@ -215,13 +215,13 @@ func gf_mul(d, a, b *[4]uint64, mq uint64) {
 	// high half (h0..h3, value at most 2*mq-1 < 2^16).
 
 	var h0, h1, h2, h3 uint64
-	h0, lo = bits.Mul64(t[4], mq << 1)
+	h0, lo = bits.Mul64(t[4], mq<<1)
 	t[0], cc = bits.Add64(t[0], lo, 0)
-	h1, lo = bits.Mul64(t[5], mq << 1)
+	h1, lo = bits.Mul64(t[5], mq<<1)
 	t[1], cc = bits.Add64(t[1], lo, cc)
-	h2, lo = bits.Mul64(t[6], mq << 1)
+	h2, lo = bits.Mul64(t[6], mq<<1)
 	t[2], cc = bits.Add64(t[2], lo, cc)
-	h3, lo = bits.Mul64(t[7], mq << 1)
+	h3, lo = bits.Mul64(t[7], mq<<1)
 	t[3], cc = bits.Add64(t[3], lo, cc)
 	h3 += cc
 
@@ -235,7 +235,7 @@ func gf_mul(d, a, b *[4]uint64, mq uint64) {
 
 	h3 = (h3 << 1) | (t[3] >> 63)
 	t[3] &= 0x7FFFFFFFFFFFFFFF
-	d[0], cc = bits.Add64(t[0], h3 * mq, 0)
+	d[0], cc = bits.Add64(t[0], h3*mq, 0)
 	d[1], cc = bits.Add64(t[1], h0, cc)
 	d[2], cc = bits.Add64(t[2], h1, cc)
 	d[3], cc = bits.Add64(t[3], h2, cc)
@@ -301,19 +301,19 @@ func gf_sqr(d, a *[4]uint64, mq uint64) {
 	// see the comments in that function.
 
 	var h0, h1, h2, h3 uint64
-	h0, lo = bits.Mul64(t[4], mq << 1)
+	h0, lo = bits.Mul64(t[4], mq<<1)
 	t[0], cc = bits.Add64(t[0], lo, 0)
-	h1, lo = bits.Mul64(t[5], mq << 1)
+	h1, lo = bits.Mul64(t[5], mq<<1)
 	t[1], cc = bits.Add64(t[1], lo, cc)
-	h2, lo = bits.Mul64(t[6], mq << 1)
+	h2, lo = bits.Mul64(t[6], mq<<1)
 	t[2], cc = bits.Add64(t[2], lo, cc)
-	h3, lo = bits.Mul64(t[7], mq << 1)
+	h3, lo = bits.Mul64(t[7], mq<<1)
 	t[3], cc = bits.Add64(t[3], lo, cc)
 	h3 += cc
 
 	h3 = (h3 << 1) | (t[3] >> 63)
 	t[3] &= 0x7FFFFFFFFFFFFFFF
-	d[0], cc = bits.Add64(t[0], h3 * mq, 0)
+	d[0], cc = bits.Add64(t[0], h3*mq, 0)
 	d[1], cc = bits.Add64(t[1], h0, cc)
 	d[2], cc = bits.Add64(t[2], h1, cc)
 	d[3], cc = bits.Add64(t[3], h2, cc)
@@ -331,7 +331,7 @@ func gf_sqr_x(d, a *[4]uint64, n uint, mq uint64) {
 		return
 	}
 	gf_sqr(d, a, mq)
-	for n -= 1; n != 0; n -- {
+	for n -= 1; n != 0; n-- {
 		gf_sqr(d, d, mq)
 	}
 }
@@ -346,11 +346,11 @@ func gf_half(d, a *[4]uint64, mq uint64) {
 	// on the least significant bit of the source.
 	var e uint64 = -(a[0] & 1)
 	var cc uint64
-	d[0], cc = bits.Add64((a[0] >> 1) | (a[1] << 63), e & -((mq - 1) >> 1), 0)
-	for i := 1; i < 3; i ++ {
-		d[i], cc = bits.Add64((a[i] >> 1) | (a[i + 1] << 63), e, cc)
+	d[0], cc = bits.Add64((a[0]>>1)|(a[1]<<63), e&-((mq-1)>>1), 0)
+	for i := 1; i < 3; i++ {
+		d[i], cc = bits.Add64((a[i]>>1)|(a[i+1]<<63), e, cc)
 	}
-	d[3], _ = bits.Add64(a[3] >> 1, e >> 2, cc)
+	d[3], _ = bits.Add64(a[3]>>1, e>>2, cc)
 }
 
 // Internal function for left-shifting by some bits.
@@ -363,7 +363,7 @@ func gf_lsh(d, a *[4]uint64, n uint, mq uint64) {
 	// First pass: left shift, extra bits in g.
 	var g uint64 = a[0] >> (64 - n)
 	d[0] = a[0] << n
-	for i := 1; i < 4; i ++ {
+	for i := 1; i < 4; i++ {
 		w := a[i]
 		d[i] = (w << n) | g
 		g = w >> (64 - n)
@@ -373,8 +373,8 @@ func gf_lsh(d, a *[4]uint64, n uint, mq uint64) {
 	// value).
 	g = (g << 1) | (d[3] >> 63)
 	var cc uint64
-	d[0], cc = bits.Add64(d[0], g * mq, 0)
-	for i := 1; i < 3; i ++ {
+	d[0], cc = bits.Add64(d[0], g*mq, 0)
+	for i := 1; i < 3; i++ {
 		d[i], cc = bits.Add64(d[i], 0, cc)
 	}
 	d[3] = (d[3] & 0x7FFFFFFFFFFFFFFF) + cc
@@ -389,26 +389,26 @@ func gf_lsh(d, a *[4]uint64, n uint, mq uint64) {
 func gf_norm(d, a *[4]uint64, mq uint64) {
 	// Fold the top bit to ensure a value of at most 2^255 + mq-1.
 	var cc uint64
-	d[0], cc = bits.Add64(a[0], mq & -(a[3] >> 63), 0)
-	for i := 1; i < 3; i ++ {
+	d[0], cc = bits.Add64(a[0], mq&-(a[3]>>63), 0)
+	for i := 1; i < 3; i++ {
 		d[i], cc = bits.Add64(a[i], 0, cc)
 	}
 	d[3] = (a[3] & 0x7FFFFFFFFFFFFFFF) + cc
 
 	// Subtract p.
 	d[0], cc = bits.Sub64(d[0], -mq, 0)
-	for i := 1; i < 3; i ++ {
+	for i := 1; i < 3; i++ {
 		d[i], cc = bits.Sub64(d[i], 0xFFFFFFFFFFFFFFFF, cc)
 	}
 	d[3], cc = bits.Sub64(d[3], 0x7FFFFFFFFFFFFFFF, cc)
 
 	// If there is a borrow, add p back.
 	var e uint64 = -cc
-	d[0], cc = bits.Add64(d[0], e & -mq, 0)
-	for i := 1; i < 3; i ++ {
+	d[0], cc = bits.Add64(d[0], e&-mq, 0)
+	for i := 1; i < 3; i++ {
 		d[i], cc = bits.Add64(d[i], e, cc)
 	}
-	d[3], cc = bits.Add64(d[3], e >> 1, cc)
+	d[3], cc = bits.Add64(d[3], e>>1, cc)
 }
 
 // Internal function for comparing a value with zero. This function
@@ -420,7 +420,7 @@ func gf_iszero(a *[4]uint64, mq uint64) uint64 {
 	t0 := a[0]
 	t1 := a[0] + mq
 	t2 := a[0] + (mq << 1)
-	for i := 1; i < 3; i ++ {
+	for i := 1; i < 3; i++ {
 		t0 |= a[i]
 		t1 |= ^a[i]
 		t2 |= ^a[i]
@@ -458,8 +458,8 @@ func gf_encode(b []byte, a *[4]uint64, mq uint64) []byte {
 	dst := b2[len1:]
 	var t [4]uint64
 	gf_norm(&t, a, mq)
-	for i := 0; i < 4; i ++ {
-		binary.LittleEndian.PutUint64(dst[8 * i:], t[i])
+	for i := 0; i < 4; i++ {
+		binary.LittleEndian.PutUint64(dst[8*i:], t[i])
 	}
 	return b2
 }
@@ -468,8 +468,8 @@ func gf_encode(b []byte, a *[4]uint64, mq uint64) []byte {
 // source is not in the valid range (0..p-1), then the destination is
 // set to all zeros, and 0 is returned; otherwise, 1 is returned.
 func gf_decode(d *[4]uint64, src []byte, mq uint64) uint64 {
-	for i := 0; i < 4; i ++ {
-		d[i] = binary.LittleEndian.Uint64(src[8 * i:])
+	for i := 0; i < 4; i++ {
+		d[i] = binary.LittleEndian.Uint64(src[8*i:])
 	}
 	// Compare with the modulus. If there is a borrow (cc == 1),
 	// then the value is correct; otherwise (cc == 0) it is out of
@@ -478,7 +478,7 @@ func gf_decode(d *[4]uint64, src []byte, mq uint64) uint64 {
 	_, cc = bits.Sub64(d[1], 0xFFFFFFFFFFFFFFFF, cc)
 	_, cc = bits.Sub64(d[2], 0xFFFFFFFFFFFFFFFF, cc)
 	_, cc = bits.Sub64(d[3], 0x7FFFFFFFFFFFFFFF, cc)
-	for i := 0; i < 4; i ++ {
+	for i := 0; i < 4; i++ {
 		d[i] &= -cc
 	}
 	return cc
@@ -500,8 +500,8 @@ func gf_decodeReduce(d *[4]uint64, src []byte, mq uint64) {
 	n -= j
 	var buf [32]byte
 	copy(buf[:], src[n:])
-	for i := 0; i < 4; i ++ {
-		t[i] = binary.LittleEndian.Uint64(buf[8 * i:])
+	for i := 0; i < 4; i++ {
+		t[i] = binary.LittleEndian.Uint64(buf[8*i:])
 	}
 
 	// For all remaining chunks of 32 bytes (right-to-left order),
@@ -509,8 +509,8 @@ func gf_decodeReduce(d *[4]uint64, src []byte, mq uint64) {
 	for n > 0 {
 		n -= 32
 		copy(t[4:], t[:4])
-		for i := 0; i < 4; i ++ {
-			t[i] = binary.LittleEndian.Uint64(src[n + 8 * i:])
+		for i := 0; i < 4; i++ {
+			t[i] = binary.LittleEndian.Uint64(src[n+8*i:])
 		}
 
 		// Fold upper half into lower half, multiplied by 2*mq.
@@ -520,13 +520,13 @@ func gf_decodeReduce(d *[4]uint64, src []byte, mq uint64) {
 		// 2*mq-1 < 2^16).
 		var h0, h1, h2, h3 uint64
 		var lo, cc uint64
-		h0, lo = bits.Mul64(t[4], mq << 1)
+		h0, lo = bits.Mul64(t[4], mq<<1)
 		t[0], cc = bits.Add64(t[0], lo, 0)
-		h1, lo = bits.Mul64(t[5], mq << 1)
+		h1, lo = bits.Mul64(t[5], mq<<1)
 		t[1], cc = bits.Add64(t[1], lo, cc)
-		h2, lo = bits.Mul64(t[6], mq << 1)
+		h2, lo = bits.Mul64(t[6], mq<<1)
 		t[2], cc = bits.Add64(t[2], lo, cc)
-		h3, lo = bits.Mul64(t[7], mq << 1)
+		h3, lo = bits.Mul64(t[7], mq<<1)
 		t[3], cc = bits.Add64(t[3], lo, cc)
 		h3 += cc
 
@@ -541,7 +541,7 @@ func gf_decodeReduce(d *[4]uint64, src []byte, mq uint64) {
 		// directly.
 		h3 = (h3 << 1) | (t[3] >> 63)
 		t[3] &= 0x7FFFFFFFFFFFFFFF
-		t[0], cc = bits.Add64(t[0], h3 * mq, 0)
+		t[0], cc = bits.Add64(t[0], h3*mq, 0)
 		t[1], cc = bits.Add64(t[1], h0, cc)
 		t[2], cc = bits.Add64(t[2], h1, cc)
 		t[3], cc = bits.Add64(t[3], h2, cc)
@@ -616,13 +616,13 @@ func gf_lin_div31_abs(d, a, b *[4]uint64, f, g uint64) uint64 {
 	// Apply signs sf and sg to a and b, respectively.
 	var ta, tb [4]uint64
 	var cc uint64
-	ta[0], cc = bits.Add64(a[0] ^ -sf, sf, 0)
-	for i := 1; i < 4; i ++ {
-		ta[i], cc = bits.Add64(a[i] ^ -sf, 0, cc)
+	ta[0], cc = bits.Add64(a[0]^-sf, sf, 0)
+	for i := 1; i < 4; i++ {
+		ta[i], cc = bits.Add64(a[i]^-sf, 0, cc)
 	}
-	tb[0], cc = bits.Add64(b[0] ^ -sg, sg, 0)
-	for i := 1; i < 4; i ++ {
-		tb[i], cc = bits.Add64(b[i] ^ -sg, 0, cc)
+	tb[0], cc = bits.Add64(b[0]^-sg, sg, 0)
+	for i := 1; i < 4; i++ {
+		tb[i], cc = bits.Add64(b[i]^-sg, 0, cc)
 	}
 
 	// Compute a*f+b*g into d, with extra word in t.
@@ -631,7 +631,7 @@ func gf_lin_div31_abs(d, a, b *[4]uint64, f, g uint64) uint64 {
 	hi, lo := bits.Mul64(tb[0], g)
 	d[0], cc = bits.Add64(z0, lo, 0)
 	t, _ := bits.Add64(z1, hi, cc)
-	for i := 1; i < 4; i ++ {
+	for i := 1; i < 4; i++ {
 		z1, z0 = bits.Mul64(ta[i], f)
 		hi, lo = bits.Mul64(tb[i], g)
 		z0, cc = bits.Add64(z0, lo, 0)
@@ -647,16 +647,16 @@ func gf_lin_div31_abs(d, a, b *[4]uint64, f, g uint64) uint64 {
 
 	// Do the division by 2^31 (right-shift, since the division is
 	// assumed to be exact).
-	for i := 0; i < 3; i ++ {
-		d[i] = (d[i] >> 31) | (d[i + 1] << 33)
+	for i := 0; i < 3; i++ {
+		d[i] = (d[i] >> 31) | (d[i+1] << 33)
 	}
 	d[3] = (d[3] >> 31) | (t << 33)
 
 	// If the result is negative, negate it.
 	t >>= 63
-	d[0], cc = bits.Add64(d[0] ^ -t, t, 0)
-	for i := 1; i < 4; i ++ {
-		d[i], cc = bits.Add64(d[i] ^ -t, 0, cc)
+	d[0], cc = bits.Add64(d[0]^-t, t, 0)
+	for i := 1; i < 4; i++ {
+		d[i], cc = bits.Add64(d[i]^-t, 0, cc)
 	}
 	return t
 }
@@ -685,7 +685,7 @@ func gf_lin(d, u, v *[4]uint64, f, g uint64, mq uint64) {
 	var cc uint64
 	d[0], cc = bits.Add64(z0, lo, 0)
 	t, _ := bits.Add64(z1, hi, cc)
-	for i := 1; i < 4; i ++ {
+	for i := 1; i < 4; i++ {
 		z1, z0 = bits.Mul64(tu[i], f)
 		hi, lo = bits.Mul64(tv[i], g)
 		z0, cc = bits.Add64(z0, lo, 0)
@@ -700,7 +700,7 @@ func gf_lin(d, u, v *[4]uint64, f, g uint64, mq uint64) {
 	z1, z0 = bits.Mul64(t, mq)
 	d[0], cc = bits.Add64(d[0], z0, 0)
 	d[1], cc = bits.Add64(d[1], z1, cc)
-	for i := 2; i < 4; i ++ {
+	for i := 2; i < 4; i++ {
 		d[i], cc = bits.Add64(d[i], 0, cc)
 	}
 }
@@ -745,7 +745,7 @@ func gf_inv_scaled(d, y *[4]uint64, mq uint64) {
 	b[0] = -mq
 	u[0] = 1
 	v[0] = 0
-	for i := 1; i < 3; i ++ {
+	for i := 1; i < 3; i++ {
 		b[i] = 0xFFFFFFFFFFFFFFFF
 		u[i] = 0
 		v[i] = 0
@@ -755,7 +755,7 @@ func gf_inv_scaled(d, y *[4]uint64, mq uint64) {
 	v[3] = 0
 
 	// First do 15*31 = 465 iterations.
-	for i := 0; i < 15; i ++ {
+	for i := 0; i < 15; i++ {
 		// Extract approximations of a and b over 64 bits:
 		//  - If len(a) <= 64 and len(b) <= 64, then we just use
 		//    their values (low limb of each).
@@ -815,7 +815,7 @@ func gf_inv_scaled(d, y *[4]uint64, mq uint64) {
 		// in the "update factors" fg0 and fg1.
 		var fg0 uint64 = 1
 		var fg1 uint64 = uint64(1) << 32
-		for j := 0; j < 31; j ++ {
+		for j := 0; j < 31; j++ {
 			a_odd := -(xa & 1)
 			_, cc := bits.Sub64(xa, xb, 0)
 			swap := a_odd & -cc
@@ -870,7 +870,7 @@ func gf_inv_scaled(d, y *[4]uint64, mq uint64) {
 	var g0 uint64 = 0
 	var f1 uint64 = 0
 	var g1 uint64 = 1
-	for j := 0; j < 43; j ++ {
+	for j := 0; j < 43; j++ {
 		a_odd := -(xa & 1)
 		_, cc := bits.Sub64(xa, xb, 0)
 		swap := a_odd & -cc
@@ -929,7 +929,7 @@ func gf_legendre(y *[4]uint64, mq uint64) uint64 {
 	//   both x = 3 mod 4 and y = 3 mod 4, in which case (x|y) = -(y|x).
 	//
 	//   (2|n) = 1 if n = 1 or 7 mod 8, or -1 if n = 3 or 5 mod 8.
-	// 
+	//
 	// We use these properties to keep track of symbol updates
 	// through the binary GCD operations. The crucial observation is
 	// that while it may happen that a or b becomes negative at some
@@ -945,13 +945,13 @@ func gf_legendre(y *[4]uint64, mq uint64) uint64 {
 
 	gf_norm(&a, y, mq)
 	b[0] = -mq
-	for i := 1; i < 3; i ++ {
+	for i := 1; i < 3; i++ {
 		b[i] = 0xFFFFFFFFFFFFFFFF
 	}
 	b[3] = 0x7FFFFFFFFFFFFFFF
 
 	// First do 15*31 = 465 iterations.
-	for i := 0; i < 15; i ++ {
+	for i := 0; i < 15; i++ {
 		// Extract approximations of a and b over 64 bits.
 		m3 := a[3] | b[3]
 		m2 := a[2] | b[2]
@@ -981,7 +981,7 @@ func gf_legendre(y *[4]uint64, mq uint64) uint64 {
 		// Run 29 iterations.
 		var fg0 uint64 = 1
 		var fg1 uint64 = uint64(1) << 32
-		for j := 0; j < 29; j ++ {
+		for j := 0; j < 29; j++ {
 			a_odd := -(xa & 1)
 			_, cc := bits.Sub64(xa, xb, 0)
 			swap := a_odd & -cc
@@ -1005,9 +1005,9 @@ func gf_legendre(y *[4]uint64, mq uint64) uint64 {
 		g0 := ((fg0 + 0x7FFFFFFF7FFFFFFF) >> 32) - 0x7FFFFFFF
 		f1 := ((fg1 + 0x7FFFFFFF7FFFFFFF) & 0xFFFFFFFF) - 0x7FFFFFFF
 		g1 := ((fg1 + 0x7FFFFFFF7FFFFFFF) >> 32) - 0x7FFFFFFF
-		a0 := (a[0] * f0 + b[0] * g0) >> 29
-		b0 := (a[0] * f1 + b[0] * g1) >> 29
-		for j := 0; j < 2; j ++ {
+		a0 := (a[0]*f0 + b[0]*g0) >> 29
+		b0 := (a[0]*f1 + b[0]*g1) >> 29
+		for j := 0; j < 2; j++ {
 			a_odd := -(xa & 1)
 			_, cc := bits.Sub64(xa, xb, 0)
 			swap := a_odd & -cc
@@ -1055,7 +1055,7 @@ func gf_legendre(y *[4]uint64, mq uint64) uint64 {
 	// Legendre symbol will occur.
 	xa := a[0]
 	xb := b[0]
-	for j := 0; j < 43; j ++ {
+	for j := 0; j < 43; j++ {
 		a_odd := -(xa & 1)
 		_, cc := bits.Sub64(xa, xb, 0)
 		swap := a_odd & -cc

@@ -1,17 +1,17 @@
 package do255e
 
 import (
-	"testing"
 	"bytes"
 	"crypto"
 	"encoding/hex"
 	"golang.org/x/crypto/sha3"
+	"testing"
 )
 
 func TestDo255eKeyGen(t *testing.T) {
-	for i := 0; (2 * i) < len(kat_DO255E_KEYGEN); i ++ {
-		rsk, _ := hex.DecodeString(kat_DO255E_KEYGEN[2 * i])
-		rpk, _ := hex.DecodeString(kat_DO255E_KEYGEN[2 * i + 1])
+	for i := 0; (2 * i) < len(kat_DO255E_KEYGEN); i++ {
+		rsk, _ := hex.DecodeString(kat_DO255E_KEYGEN[2*i])
+		rpk, _ := hex.DecodeString(kat_DO255E_KEYGEN[2*i+1])
 		sh := sha3.NewShake256()
 		var bb [1]byte
 		bb[0] = byte(i)
@@ -31,10 +31,10 @@ func TestDo255eKeyGen(t *testing.T) {
 func TestDo255eECDH(t *testing.T) {
 	for i := 0; i < len(kat_DO255E_ECDH); i += 5 {
 		rsk, _ := hex.DecodeString(kat_DO255E_ECDH[i])
-		rppk1, _ := hex.DecodeString(kat_DO255E_ECDH[i + 1])
-		rsec1, _ := hex.DecodeString(kat_DO255E_ECDH[i + 2])
-		rppk2, _ := hex.DecodeString(kat_DO255E_ECDH[i + 3])
-		rsec2, _ := hex.DecodeString(kat_DO255E_ECDH[i + 4])
+		rppk1, _ := hex.DecodeString(kat_DO255E_ECDH[i+1])
+		rsec1, _ := hex.DecodeString(kat_DO255E_ECDH[i+2])
+		rppk2, _ := hex.DecodeString(kat_DO255E_ECDH[i+3])
+		rsec2, _ := hex.DecodeString(kat_DO255E_ECDH[i+4])
 
 		sk, _ := Do255eDecodePrivateKey(rsk)
 
@@ -59,10 +59,10 @@ func TestDo255eECDH(t *testing.T) {
 func TestDo255eSign(t *testing.T) {
 	for i := 0; i < len(kat_DO255E_SIGN); i += 5 {
 		rsk, _ := hex.DecodeString(kat_DO255E_SIGN[i])
-		rpk, _ := hex.DecodeString(kat_DO255E_SIGN[i + 1])
-		seed, _ := hex.DecodeString(kat_DO255E_SIGN[i + 2])
-		data, _ := hex.DecodeString(kat_DO255E_SIGN[i + 3])
-		rsig, _ := hex.DecodeString(kat_DO255E_SIGN[i + 4])
+		rpk, _ := hex.DecodeString(kat_DO255E_SIGN[i+1])
+		seed, _ := hex.DecodeString(kat_DO255E_SIGN[i+2])
+		data, _ := hex.DecodeString(kat_DO255E_SIGN[i+3])
+		rsig, _ := hex.DecodeString(kat_DO255E_SIGN[i+4])
 
 		sk, _ := Do255eDecodePrivateKey(rsk)
 		pk := sk.Public()
@@ -89,10 +89,10 @@ func TestDo255eSign(t *testing.T) {
 
 func TestDo255eHashToCurve(t *testing.T) {
 	var src [100]byte
-	for i := 0; i < len(src); i ++ {
+	for i := 0; i < len(src); i++ {
 		src[i] = byte(i)
 	}
-	for i := 0; i < len(kat_DO255E_HASHTOCURVE); i ++ {
+	for i := 0; i < len(kat_DO255E_HASHTOCURVE); i++ {
 		rp, _ := hex.DecodeString(kat_DO255E_HASHTOCURVE[i])
 
 		P, err := Do255eHashToCurve(src[:i], crypto.Hash(0))
@@ -109,7 +109,7 @@ func TestDo255eHashToCurve(t *testing.T) {
 // Keygen tests.
 // For i in 0..19, keygen with SHAKE256((byte)i) as source.
 // Each group of two values is the private/public key pair.
-var kat_DO255E_KEYGEN = []string {
+var kat_DO255E_KEYGEN = []string{
 	"938b4583a72eb5382f3a2fa2ce57c3a4e5de0bbf30042ef0a86e36f4b8600d14",
 	"b7d9c6c6adaf587b03120202c168831bc23b2a67f66d15aa0ce1382baaf14d52",
 
@@ -178,7 +178,7 @@ var kat_DO255E_KEYGEN = []string {
 //   secret from ECDH with valid peer point
 //   public peer point (invalid)
 //   secret from ECDH with invalid peer point
-var kat_DO255E_ECDH = []string {
+var kat_DO255E_ECDH = []string{
 	"ef28a690f4129956e9309b080a4a9314a70f070bf23a4ac5a5c7ceccd79bf713",
 	"1d80ce62a0a2b3916844eee076f0ede0f58c6b1569076c80d931f482af777023",
 	"1958e2c1e90c16bd1ce032d65389acc03ca40e86d7cb7d2c3da4951d8bc1d053",
@@ -307,7 +307,7 @@ var kat_DO255E_ECDH = []string {
 //   seed (can be empty!)
 //   data (SHA3-256 of "sample X" with X = 0, 1,...)
 //   signature
-var kat_DO255E_SIGN = []string {
+var kat_DO255E_SIGN = []string{
 	"e7fefa881bd07b1c363b68a0f9e01ee04439f4aec941f402ae7be67993bcdf36",
 	"4b383536c514fdd88fadd4699bb00f57cb16af174d086e65a291cb35957ee25f",
 	"",
@@ -432,7 +432,7 @@ var kat_DO255E_SIGN = []string {
 // Hash-to-curve tests for Do255e
 // For i = 0..99, hash-to-curve using as data the first i bytes
 // of the sequence 00 01 02 03 .. 62  (raw data, no hash function)
-var kat_DO255E_HASHTOCURVE = []string {
+var kat_DO255E_HASHTOCURVE = []string{
 	"861e72edc639eedb213402247d6407ae53560ef27e95c382f49f919bd2178a1d",
 	"b72d63aaba58dc2452f076548f568a930650fda789ba831fe6240ad49e760335",
 	"740f0b266692be55685a7ccd5128e831d6e12d23047e120dc80cc30393998226",

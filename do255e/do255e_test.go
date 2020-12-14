@@ -1,13 +1,13 @@
 package do255e
 
 import (
-	"testing"
-	"encoding/hex"
 	"bytes"
+	"encoding/hex"
+	"testing"
 )
 
 func TestDo255eDecode(t *testing.T) {
-	for i := 0; i < len(kat_DO255E_DECODE_OK); i ++ {
+	for i := 0; i < len(kat_DO255E_DECODE_OK); i++ {
 		bb, _ := hex.DecodeString(kat_DO255E_DECODE_OK[i])
 		rc := Do255eCheckPoint(bb)
 		var P Do255ePoint
@@ -32,7 +32,7 @@ func TestDo255eDecode(t *testing.T) {
 
 	bzz := do255eNeutral.Bytes()
 
-	for i := 0; i < len(kat_DO255E_DECODE_BAD); i ++ {
+	for i := 0; i < len(kat_DO255E_DECODE_BAD); i++ {
 		bb, _ := hex.DecodeString(kat_DO255E_DECODE_BAD[i])
 		rc := Do255eCheckPoint(bb)
 		if rc != -1 {
@@ -54,7 +54,7 @@ func TestDo255eDecode(t *testing.T) {
 func TestDo255eMapBytes(t *testing.T) {
 	for i := 0; i < len(kat_DO255E_POINT_MAP); i += 2 {
 		bb1, _ := hex.DecodeString(kat_DO255E_POINT_MAP[i])
-		bb2, _ := hex.DecodeString(kat_DO255E_POINT_MAP[i + 1])
+		bb2, _ := hex.DecodeString(kat_DO255E_POINT_MAP[i+1])
 		var P Do255ePoint
 		P.MapBytes(bb1)
 		bb3 := P.Bytes()
@@ -68,11 +68,11 @@ func TestDo255ePointAdd(t *testing.T) {
 	for i := 0; i < len(kat_DO255E_POINT_ADD); i += 6 {
 		var P1, P2, P3, P4, P5, P6 Do255ePoint
 		bb1, _ := hex.DecodeString(kat_DO255E_POINT_ADD[i])
-		bb2, _ := hex.DecodeString(kat_DO255E_POINT_ADD[i + 1])
-		bb3, _ := hex.DecodeString(kat_DO255E_POINT_ADD[i + 2])
-		bb4, _ := hex.DecodeString(kat_DO255E_POINT_ADD[i + 3])
-		bb5, _ := hex.DecodeString(kat_DO255E_POINT_ADD[i + 4])
-		bb6, _ := hex.DecodeString(kat_DO255E_POINT_ADD[i + 5])
+		bb2, _ := hex.DecodeString(kat_DO255E_POINT_ADD[i+1])
+		bb3, _ := hex.DecodeString(kat_DO255E_POINT_ADD[i+2])
+		bb4, _ := hex.DecodeString(kat_DO255E_POINT_ADD[i+3])
+		bb5, _ := hex.DecodeString(kat_DO255E_POINT_ADD[i+4])
+		bb6, _ := hex.DecodeString(kat_DO255E_POINT_ADD[i+5])
 		P1.Decode(bb1)
 		P2.Decode(bb2)
 		P3.Decode(bb3)
@@ -133,7 +133,7 @@ func TestDo255ePointAdd(t *testing.T) {
 		var Q6 Do255ePoint
 		Q6.Generator()
 		Q6.Add(&Q5, &P2)
-		if Q6.Equal(&P6) == 0{
+		if Q6.Equal(&P6) == 0 {
 			t.Fatalf("Addition failed (7):\nexp = %s\ngot = %s\n", hex.EncodeToString(P6.Encode(nil)), hex.EncodeToString(Q6.Encode(nil)))
 		}
 		Q6.Generator()
@@ -174,11 +174,11 @@ func TestDo255ePointAdd(t *testing.T) {
 
 		// Testing sequences of doublings.
 		var Q10, Q11 Do255ePoint
-		for j := 0; j < 10; j ++ {
+		for j := 0; j < 10; j++ {
 			Q10.Generator()
 			Q10.DoubleX(&Q6, uint(j))
 			Q11.Set(&Q6)
-			for k := 0; k < j; k ++ {
+			for k := 0; k < j; k++ {
 				Q11.Double(&Q11)
 			}
 			if Q10.Equal(&Q11) == 0 {
@@ -193,8 +193,8 @@ func TestDo255ePointMul(t *testing.T) {
 		var P1, P2, P3 Do255ePoint
 		var n Do255eScalar
 		bb1, _ := hex.DecodeString(kat_DO255E_POINT_MUL[i])
-		bb2, _ := hex.DecodeString(kat_DO255E_POINT_MUL[i + 1])
-		bb3, _ := hex.DecodeString(kat_DO255E_POINT_MUL[i + 2])
+		bb2, _ := hex.DecodeString(kat_DO255E_POINT_MUL[i+1])
+		bb3, _ := hex.DecodeString(kat_DO255E_POINT_MUL[i+2])
 		P1.Decode(bb1)
 		n.DecodeReduce(bb2)
 		P2.Decode(bb3)
@@ -206,7 +206,7 @@ func TestDo255ePointMul(t *testing.T) {
 
 	var rng prng
 	rng.init("test mulgen do255e")
-	for i := 0; i < 1000; i ++ {
+	for i := 0; i < 1000; i++ {
 		var n Do255eScalar
 		if i == 0 {
 			n[0] = 0
@@ -227,8 +227,8 @@ func TestDo255ePointMul(t *testing.T) {
 	bb, _ := hex.DecodeString(kat_DO255E_MC_POINT_MUL[0])
 	var P Do255ePoint
 	P.Decode(bb)
-	for i := 1; i < len(kat_DO255E_MC_POINT_MUL); i ++ {
-		for j := 0; j < 1000; j ++ {
+	for i := 1; i < len(kat_DO255E_MC_POINT_MUL); i++ {
+		for j := 0; j < 1000; j++ {
 			var n Do255eScalar
 			n.DecodeReduce(bb)
 			P.Mul(&P, &n)
@@ -245,7 +245,7 @@ func TestDo255ePointMul(t *testing.T) {
 func TestDo255eVerifyHelper(t *testing.T) {
 	var rng prng
 	rng.init("test verify helper do255e")
-	for i := 0; i < 1000; i ++ {
+	for i := 0; i < 1000; i++ {
 		var n, k0, k1 Do255eScalar
 
 		rng.mk256((*[4]uint64)(&n))
@@ -314,7 +314,7 @@ func BenchmarkMul255e(b *testing.B) {
 	bb, _ = hex.DecodeString("81d3066b23528ff3728a200ae411d815ba612b45c2556fa1000cb665de692a73")
 	s.DecodeReduce(bb)
 	b.ResetTimer()
-	for i := 0; i < b.N; i ++ {
+	for i := 0; i < b.N; i++ {
 		P.Mul(&P, &s)
 	}
 }
@@ -325,7 +325,7 @@ func BenchmarkMulGen255e(b *testing.B) {
 	bb, _ := hex.DecodeString("81d3066b23528ff3728a200ae411d815ba612b45c2556fa1000cb665de692a73")
 	s.DecodeReduce(bb)
 	b.ResetTimer()
-	for i := 0; i < b.N; i ++ {
+	for i := 0; i < b.N; i++ {
 		P.MulGen(&s)
 	}
 }
@@ -338,7 +338,7 @@ func BenchmarkVerify255e(b *testing.B) {
 	rng.mk256((*[4]uint64)(&k0))
 	rng.mk256((*[4]uint64)(&k1))
 	b.ResetTimer()
-	for i := 0; i < b.N; i ++ {
+	for i := 0; i < b.N; i++ {
 		do255eGenerator.VerifyHelper(&k0, &k1, encR[:])
 	}
 }
@@ -348,15 +348,15 @@ func BenchmarkVerifyVartime255e(b *testing.B) {
 	var rng prng
 	rng.init("bench verify do255e")
 	var k0, k1 [100]Do255eScalar
-	for i := 0; i < 100; i ++ {
+	for i := 0; i < 100; i++ {
 		rng.mk256((*[4]uint64)(&k0[i]))
 		rng.mk256((*[4]uint64)(&k1[i]))
 	}
 	b.ResetTimer()
 	j := 0
-	for i := 0; i < b.N; i ++ {
+	for i := 0; i < b.N; i++ {
 		do255eGenerator.VerifyHelperVartime(&k0[j], &k1[j], encR[:])
-		j ++
+		j++
 		if j >= len(k0) {
 			j = 0
 		}
@@ -364,7 +364,7 @@ func BenchmarkVerifyVartime255e(b *testing.B) {
 }
 
 // Strings that decode to valid points.
-var kat_DO255E_DECODE_OK = []string {
+var kat_DO255E_DECODE_OK = []string{
 	"0000000000000000000000000000000000000000000000000000000000000000",
 	"5863d164f563f2fe6b720174c440d41666397b4aaf6d2243c57f5ac77b6f5361",
 	"81d3066b23528ff3728a200ae411d815ba612b45c2556fa1000cb665de692a73",
@@ -389,7 +389,7 @@ var kat_DO255E_DECODE_OK = []string {
 }
 
 // Strings that do not decode to valid points.
-var kat_DO255E_DECODE_BAD = []string {
+var kat_DO255E_DECODE_BAD = []string{
 	// These values cannot be decoded (w is out of range).
 	"08761e618ba81e1cb145e406e8c6d63b115d2ca460a585a85275ffed14ec1ea9",
 	"6743c991104ac09dd95f81607645aa69892ac9c79e186fb666c201b465f40e94",
@@ -436,7 +436,7 @@ var kat_DO255E_DECODE_BAD = []string {
 }
 
 // Mapping of bytes to points.
-var kat_DO255E_POINT_MAP = []string {
+var kat_DO255E_POINT_MAP = []string{
 	// Map-to-curve test vectors for Do255e
 	// Each group of two values is: input bytes, mapped point
 	"0000000000000000000000000000000000000000000000000000000000000000",
@@ -565,7 +565,7 @@ var kat_DO255E_POINT_MAP = []string {
 //   P4 = 2*P1
 //   P5 = P4 + P2 = P3 + P1
 //   P6 = P5 + P2 = P4 + 2*P2
-var kat_DO255E_POINT_ADD = []string {
+var kat_DO255E_POINT_ADD = []string{
 	"8bf6108baa2a18e584a9d9ddb84d60d1fb7152c0b070dc32211454aa63182028",
 	"71cb77fb7b314b5917f984007e4b9e8da84e30df23b6361f3d5748859b3c3d46",
 	"05efef11a57d4bddc59507920f67c702744485e17bca3960b9c75a6bd19ac535",
@@ -709,7 +709,7 @@ var kat_DO255E_POINT_ADD = []string {
 
 // Point multiplication tests. Each group of 3 strings is: P, n, n*P
 // Scalar n is not reduced modulo r.
-var kat_DO255E_POINT_MUL = []string {
+var kat_DO255E_POINT_MUL = []string{
 	"ef599ab0984eba6f1aee6c55415e9c30d1cb856b58492b645cec774b8f5d6e1c",
 	"fef20582903e6fac0f8c4c4f09598d4feca23851250200204b3988dc73d3713e",
 	"3fd5579d954e26abcf2cc8f5b452c3bc060eb012ecbfb81c8a061bd1ab54cc4d",
@@ -795,7 +795,7 @@ var kat_DO255E_POINT_MUL = []string {
 // Starting point P[0] = (2**120)*G.
 // Then, for i = 1...10000 (inclusive): P[i] = int(P[i-1].w)*P[i-1]
 // Below are P[0], P[1000], P[2000],... P[10000]
-var kat_DO255E_MC_POINT_MUL = []string {
+var kat_DO255E_MC_POINT_MUL = []string{
 	"fae3f207045cdc8e1a73b743fbfd81b9d23bec1392603a524e4e53677ac8646d",
 
 	"7c13b0849e3e5e26756e471cd2e8dd06c4d96e24c2edb547d39c9813579d0670",

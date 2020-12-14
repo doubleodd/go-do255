@@ -1,10 +1,10 @@
 package field
 
 import (
-	"fmt"
-	"math/big"
 	"crypto/sha512"
 	"encoding/binary"
+	"fmt"
+	"math/big"
 )
 
 // =====================================================================
@@ -36,7 +36,7 @@ func (p *prng) generate(d []byte) {
 		if c > n {
 			c = n
 		}
-		copy(d, p.buf[p.ptr : p.ptr + c])
+		copy(d, p.buf[p.ptr:p.ptr+c])
 		d = d[c:]
 		n -= c
 		p.ptr += c
@@ -47,8 +47,8 @@ func (p *prng) generate(d []byte) {
 func (p *prng) mk256(d *[4]uint64) {
 	var bb [32]byte
 	p.generate(bb[:])
-	for i := 0; i < 4; i ++ {
-		d[i] = binary.LittleEndian.Uint64(bb[8 * i:])
+	for i := 0; i < 4; i++ {
+		d[i] = binary.LittleEndian.Uint64(bb[8*i:])
 	}
 }
 
@@ -63,7 +63,7 @@ func (p *prng) mkgf(d *[4]uint64) {
 // modulo m.
 func int256ToBigMod(a *[4]uint64, m *big.Int) big.Int {
 	var x, y big.Int
-	for i := 3; i >= 0; i -- {
+	for i := 3; i >= 0; i-- {
 		y.SetUint64(a[i])
 		x.Lsh(&x, 64).Add(&x, &y)
 	}
@@ -101,8 +101,8 @@ func gfToBig(a *[4]uint64, p *big.Int) big.Int {
 func decodeToBigLE(src []byte) big.Int {
 	n := len(src)
 	tt := make([]byte, n)
-	for i := 0; i < n; i ++ {
-		tt[i] = src[n - 1 - i]
+	for i := 0; i < n; i++ {
+		tt[i] = src[n-1-i]
 	}
 	var x big.Int
 	x.SetBytes(tt)

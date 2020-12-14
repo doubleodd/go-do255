@@ -1,9 +1,9 @@
 package do255e
 
 import (
-	"testing"
 	"fmt"
 	"math/big"
+	"testing"
 )
 
 func TestDo255eScalar(t *testing.T) {
@@ -14,26 +14,26 @@ func TestDo255eScalar(t *testing.T) {
 	r0.SetUint64(0x62F36CF0ABF873AC).Lsh(&r0, 64).Add(&r0, &tt)
 	r.SetUint64(1).Lsh(&r, 254).Sub(&r, &r0)
 	r_enc := r.Bytes()
-	for j := 0; (j + j) < len(r_enc); j ++ {
+	for j := 0; (j + j) < len(r_enc); j++ {
 		t := r_enc[j]
-		r_enc[j] = r_enc[len(r_enc) - 1 - j]
-		r_enc[len(r_enc) - 1 - j] = t
+		r_enc[j] = r_enc[len(r_enc)-1-j]
+		r_enc[len(r_enc)-1-j] = t
 	}
 
 	var a, b, c Do255eScalar
-	for i := 0; i < 1000; i ++ {
+	for i := 0; i < 1000; i++ {
 		var bb, bb2 [70]byte
 		rng.generate(bb[:])
 		a.DecodeReduce(bb[:])
 		za := int256ToBigMod((*[4]uint64)(&a), &r)
-		for j := 0; j < len(bb); j ++ {
-			bb2[len(bb) - 1 - j] = bb[j]
+		for j := 0; j < len(bb); j++ {
+			bb2[len(bb)-1-j] = bb[j]
 		}
 		var zt big.Int
 		zt.SetBytes(bb2[:]).Mod(&zt, &r)
 		if za.Cmp(&zt) != 0 {
 			s := "0x"
-			for j := 0; j < len(bb2); j ++ {
+			for j := 0; j < len(bb2); j++ {
 				s += fmt.Sprintf("%02X", bb2[j])
 			}
 			t.Fatalf("Reduction failed:\nsrc = %s\ndst = %s\n", s, int256ToString((*[4]uint64)(&a)))
@@ -75,8 +75,8 @@ func TestDo255eScalar(t *testing.T) {
 		if i < 500 {
 			if ds != 1 {
 				s := "0x"
-				for j := 0; j < len(aa); j ++ {
-					s += fmt.Sprintf("%02X", aa[31 - j])
+				for j := 0; j < len(aa); j++ {
+					s += fmt.Sprintf("%02X", aa[31-j])
 				}
 				t.Fatalf("In-range scalar decoding failed:\nsrc = %s\nout = %d\n", s, ds)
 			}
@@ -85,8 +85,8 @@ func TestDo255eScalar(t *testing.T) {
 		} else {
 			if ds != -1 {
 				s := "0x"
-				for j := 0; j < len(aa); j ++ {
-					s += fmt.Sprintf("%02X", aa[31 - j])
+				for j := 0; j < len(aa); j++ {
+					s += fmt.Sprintf("%02X", aa[31-j])
 				}
 				t.Fatalf("Out of range scalar was decoded:\nsrc = %s\ndst = %s\nout = %d\n", s, int256ToString((*[4]uint64)(&a)), ds)
 			}
@@ -95,8 +95,8 @@ func TestDo255eScalar(t *testing.T) {
 		za = int256ToBigMod((*[4]uint64)(&a), &r)
 		if za.Cmp(&zt) != 0 {
 			s := "0x"
-			for j := 0; j < len(aa); j ++ {
-				s += fmt.Sprintf("%02X", aa[31 - j])
+			for j := 0; j < len(aa); j++ {
+				s += fmt.Sprintf("%02X", aa[31-j])
 			}
 			t.Fatalf("Wrong decoded value:\nsrc = %s\ndst = %s\n", s, int256ToString((*[4]uint64)(&a)))
 		}

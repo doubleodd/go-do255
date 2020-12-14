@@ -2,8 +2,8 @@ package field
 
 import (
 	"fmt"
-	"testing"
 	"math/big"
+	"testing"
 )
 
 // Tests for GF255e (integers modulo p = 2^255 - 18651).
@@ -17,9 +17,9 @@ func TestGF255eAdd(t *testing.T) {
 	var p, mq big.Int
 	mq.SetUint64(18651)
 	p.SetUint64(1).Lsh(&p, 255).Sub(&p, &mq)
-	for i := 0; i < 100000; i ++ {
+	for i := 0; i < 100000; i++ {
 		if i < 30000 {
-			for j := 0; j < 4; j ++ {
+			for j := 0; j < 4; j++ {
 				a[j] = 0xFFFFFFFFFFFFFFFF
 				b[j] = 0xFFFFFFFFFFFFFFFF
 			}
@@ -51,9 +51,9 @@ func TestGF255eSub(t *testing.T) {
 	var p, mq big.Int
 	mq.SetUint64(18651)
 	p.SetUint64(1).Lsh(&p, 255).Sub(&p, &mq)
-	for i := 0; i < 100000; i ++ {
+	for i := 0; i < 100000; i++ {
 		if i < 30000 {
-			for j := 0; j < 4; j ++ {
+			for j := 0; j < 4; j++ {
 				a[j] = 0xFFFFFFFFFFFFFFFF
 				b[j] = 0xFFFFFFFFFFFFFFFF
 			}
@@ -95,15 +95,15 @@ func TestGF255eNeg(t *testing.T) {
 	var p, mq big.Int
 	mq.SetUint64(18651)
 	p.SetUint64(1).Lsh(&p, 255).Sub(&p, &mq)
-	for i := 0; i < 100000; i ++ {
+	for i := 0; i < 100000; i++ {
 		if i < 30000 {
-			for j := 0; j < 3; j ++ {
+			for j := 0; j < 3; j++ {
 				a[j] = 0xFFFFFFFFFFFFFFFF
 			}
 			a[3] = 0xFFFFFFFFFFFFFFFF - uint64(i)
 		} else if i < 60000 {
 			a[0] = uint64(i - 30000)
-			for j := 1; j < 4; j ++ {
+			for j := 1; j < 4; j++ {
 				a[j] = 0
 			}
 		} else {
@@ -131,9 +131,9 @@ func TestGF255eDecode(t *testing.T) {
 	mq.SetUint64(18651)
 	p.SetUint64(1).Lsh(&p, 255).Sub(&p, &mq)
 	var bb [100]byte
-	for i := 0; i < 1000; i ++ {
+	for i := 0; i < 1000; i++ {
 		rng.generate(bb[:])
-		for j := 0; j <= len(bb); j ++ {
+		for j := 0; j <= len(bb); j++ {
 			var a GF255e
 			a.DecodeReduce(bb[:j])
 			za := gfToBig((*[4]uint64)(&a), &p)
@@ -141,10 +141,10 @@ func TestGF255eDecode(t *testing.T) {
 			zb.Mod(&zb, &p)
 			if za.Cmp(&zb) != 0 {
 				sbb := "0x"
-				for k := j - 1; k >= 0; k -- {
+				for k := j - 1; k >= 0; k-- {
 					sbb += fmt.Sprintf("%02X", bb[k])
 				}
-				t.Fatalf("ERR decode:\nsrc = %s\na = %s\nb = %s\n", sbb, gfToString((*[4]uint64)(&a)), "0x" + zb.Text(16))
+				t.Fatalf("ERR decode:\nsrc = %s\na = %s\nb = %s\n", sbb, gfToString((*[4]uint64)(&a)), "0x"+zb.Text(16))
 			}
 		}
 	}
@@ -157,9 +157,9 @@ func TestGF255eMul(t *testing.T) {
 	var p, mq big.Int
 	mq.SetUint64(18651)
 	p.SetUint64(1).Lsh(&p, 255).Sub(&p, &mq)
-	for i := 0; i < 100000; i ++ {
+	for i := 0; i < 100000; i++ {
 		if i < 30000 {
-			for j := 0; j < 4; j ++ {
+			for j := 0; j < 4; j++ {
 				a[j] = 0xFFFFFFFFFFFFFFFF
 				b[j] = 0xFFFFFFFFFFFFFFFF
 			}
@@ -201,15 +201,15 @@ func TestGF255eShift(t *testing.T) {
 	var p, mq big.Int
 	mq.SetUint64(18651)
 	p.SetUint64(1).Lsh(&p, 255).Sub(&p, &mq)
-	for i := 0; i < 100000; i ++ {
+	for i := 0; i < 100000; i++ {
 		if i < 30000 {
-			for j := 0; j < 4; j ++ {
+			for j := 0; j < 4; j++ {
 				a[j] = 0xFFFFFFFFFFFFFFFF
 			}
 			a[3] = 0xFFFFFFFFFFFFFFFF - uint64(i)
 		} else if i < 60000 {
 			a[0] = uint64(i - 30000)
-			for j := 1; j < 4; j ++ {
+			for j := 1; j < 4; j++ {
 				a[j] = 0
 			}
 		} else {
@@ -229,7 +229,7 @@ func TestGF255eShift(t *testing.T) {
 			t.Fatalf("ERR half:\na = %s\nc = %s\n", gfToString((*[4]uint64)(&a)), gfToString((*[4]uint64)(&c)))
 		}
 
-		for n := 1; n <= 15; n ++ {
+		for n := 1; n <= 15; n++ {
 			c.Lsh(&a, uint(n))
 			zc := gfToBig((*[4]uint64)(&c), &p)
 			zd.Lsh(&za, uint(n)).Mod(&zd, &p)
@@ -244,10 +244,10 @@ func TestGF255eInv(t *testing.T) {
 	var rng prng
 	rng.init("test inv GF255e")
 	var a, c, d GF255e
-	for i := 1; i < 100000; i ++ {
+	for i := 1; i < 100000; i++ {
 		if i < 100 {
 			a[0] = -uint64(18651 + i)
-			for j := 1; j < 3; j ++ {
+			for j := 1; j < 3; j++ {
 				a[j] = 0xFFFFFFFFFFFFFFFF
 			}
 			a[3] = 0x7FFFFFFFFFFFFFFF
@@ -273,11 +273,11 @@ func TestGF255eLegendre(t *testing.T) {
 	var rng prng
 	rng.init("test Legendre GF255e")
 	var a GF255e
-	for i := 0; i < 100000; i ++ {
+	for i := 0; i < 100000; i++ {
 		// Since 2^255 - 18651 = 5 mod 8, -1 is a square but 2 is not.
 		if i < 100 {
-			a[0] = -uint64(18651 + i * i)
-			for j := 1; j < 3; j ++ {
+			a[0] = -uint64(18651 + i*i)
+			for j := 1; j < 3; j++ {
 				a[j] = 0xFFFFFFFFFFFFFFFF
 			}
 			a[3] = 0x7FFFFFFFFFFFFFFF
@@ -308,11 +308,11 @@ func TestGF255eSqrt(t *testing.T) {
 	var rng prng
 	rng.init("test Sqrt GF255e")
 	var a, c, d GF255e
-	for i := 0; i < 100000; i ++ {
+	for i := 0; i < 100000; i++ {
 		// Since 2^255 - 18651 = 5 mod 8, -1 is a square but 2 is not.
 		if i < 100 {
-			a[0] = -uint64(18651 + i * i)
-			for j := 1; j < 3; j ++ {
+			a[0] = -uint64(18651 + i*i)
+			for j := 1; j < 3; j++ {
 				a[j] = 0xFFFFFFFFFFFFFFFF
 			}
 			a[3] = 0x7FFFFFFFFFFFFFFF
@@ -354,7 +354,7 @@ func BenchmarkGF255eSqrt(b *testing.B) {
 	x[2] = 0xFCECE0C9FAEA5119
 	x[3] = 0x5CE56163CA711773
 	b.ResetTimer()
-	for i := 0; i < b.N; i ++ {
+	for i := 0; i < b.N; i++ {
 		x.Sqrt(&x)
 	}
 }
@@ -366,7 +366,7 @@ func BenchmarkGF255eInv(b *testing.B) {
 	x[2] = 0xFCECE0C9FAEA5119
 	x[3] = 0x5CE56163CA711773
 	b.ResetTimer()
-	for i := 0; i < b.N; i ++ {
+	for i := 0; i < b.N; i++ {
 		x.Inv(&x)
 	}
 }
@@ -378,7 +378,7 @@ func BenchmarkGF255eLegendre(b *testing.B) {
 	x[2] = 0xFCECE0C9FAEA5119
 	x[3] = 0x5CE56163CA711773
 	b.ResetTimer()
-	for i := 0; i < b.N; i ++ {
+	for i := 0; i < b.N; i++ {
 		x.Legendre()
 	}
 }
