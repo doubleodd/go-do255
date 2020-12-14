@@ -1,8 +1,8 @@
 package do255e
 
 import (
-	"math/bits"
 	"github.com/doubleodd/go-do255/internal/scalar"
+	"math/bits"
 )
 
 // This file defines types and functions for do255e scalars, i.e.
@@ -76,7 +76,7 @@ func (s *Do255eScalar) Sub(a, b *Do255eScalar) *Do255eScalar {
 // Scalar negation: s is set to -a (mod r).
 // A pointer to s is returned.
 func (s *Do255eScalar) Neg(a *Do255eScalar) *Do255eScalar {
-	var t = [4]uint64 { 0, 0, 0, 0 }
+	var t = [4]uint64{0, 0, 0, 0}
 	scalar.Sub((*[4]uint64)(s), &t, (*[4]uint64)(a), do255eModrReduce256Partial, &do255eOrder)
 	return s
 }
@@ -93,7 +93,7 @@ func (s *Do255eScalar) Mul(a, b *Do255eScalar) *Do255eScalar {
 const do255e_r0_lo uint64 = 0xE0AD37518B27BADB
 const do255e_r0_hi uint64 = 0x62F36CF0ABF873AC
 
-var do255eOrder = [4]uint64 {
+var do255eOrder = [4]uint64{
 	0x1F52C8AE74D84525,
 	0x9D0C930F54078C53,
 	0xFFFFFFFFFFFFFFFF,
@@ -143,7 +143,7 @@ func do255eModrReduce256Finish(d, a *[4]uint64) {
 	// Since the result fits on 255 bits, the top bit is a sign bit,
 	// which we use to decide whether we use t[] or a[] as result.
 	m := -(t[3] >> 63)
-	for i := 0; i < 4; i ++ {
+	for i := 0; i < 4; i++ {
 		d[i] = t[i] ^ (m & (a[i] ^ t[i]))
 	}
 }
@@ -226,13 +226,13 @@ func do255eMulDivrRounded(d *[2]uint64, k *[4]uint64, e *[2]uint64) {
 	// The high limb is in th and it is lower than 2^63. If it
 	// is lower than 2^62, then y is too large and we must
 	// decrement it; otherwise, we keep it unchanged.
-	d[0], cc = bits.Sub64(y[0], 1 - (th >> 62), 0)
+	d[0], cc = bits.Sub64(y[0], 1-(th>>62), 0)
 	d[1] = y[1] - cc
 }
 
 // Constants for scalar splitting.
-var do255e_u = [2]uint64 { 0x2ACCF9DEC93F6111, 0x1A509F7A53C2C6E6 }
-var do255e_v = [2]uint64 { 0x0B7A31305466F77E, 0x7D440C6AFFBB3A93 }
+var do255e_u = [2]uint64{0x2ACCF9DEC93F6111, 0x1A509F7A53C2C6E6}
+var do255e_v = [2]uint64{0x0B7A31305466F77E, 0x7D440C6AFFBB3A93}
 
 // Split scalar k (256 bits) into k0 and k1 (128 bits each, signed),
 // such that k = k0 + k1*mu mod r, where mu is a square root of -1

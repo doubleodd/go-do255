@@ -47,21 +47,21 @@ type Do255sPoint struct {
 }
 
 // Preallocated neutral point. Do not modify.
-var do255sNeutral = Do255sPoint {
-	x: gf.GF255s { 0, 0, 0, 0 },
-	z: gf.GF255s { 1, 0, 0, 0 },
-	u: gf.GF255s { 0, 0, 0, 0 },
-	t: gf.GF255s { 1, 0, 0, 0 },
+var do255sNeutral = Do255sPoint{
+	x: gf.GF255s{0, 0, 0, 0},
+	z: gf.GF255s{1, 0, 0, 0},
+	u: gf.GF255s{0, 0, 0, 0},
+	t: gf.GF255s{1, 0, 0, 0},
 }
 
 // Preallocated conventional generator point. Do not modify.
-var do255sGenerator = Do255sPoint {
-	x: gf.GF255s {
+var do255sGenerator = Do255sPoint{
+	x: gf.GF255s{
 		0x4803AC7D33B156B1, 0x3EF832265840B591,
-		0x213759ECCB010B9D, 0x39BD72651783FB6D },
-	z: gf.GF255s { 1, 0, 0, 0 },
-	u: gf.GF255s { 3, 0, 0, 0 },
-	t: gf.GF255s { 1, 0, 0, 0 },
+		0x213759ECCB010B9D, 0x39BD72651783FB6D},
+	z: gf.GF255s{1, 0, 0, 0},
+	u: gf.GF255s{3, 0, 0, 0},
+	t: gf.GF255s{1, 0, 0, 0},
 }
 
 // Create a new point. The point is set to the group neutral element (N).
@@ -187,7 +187,7 @@ func (P *Do255sPoint) Decode(src []byte) int {
 	// If x is a square, then we must use the other solution, i.e.
 	// ((w^2 - a) - d)/2, which we obtain by subtracting d.
 	qr := x.Legendre()
-	d.Select(&d, &gf.GF255s_ZERO, (qr + 1) >> 1)
+	d.Select(&d, &gf.GF255s_ZERO, (qr+1)>>1)
 	x.Sub(&x, &d)
 
 	// If decoding failed, or if the value was 0, then r == 0 at
@@ -457,15 +457,15 @@ func (P *Do255sPoint) DoubleX(Q *Do255sPoint, n uint) *Do255sPoint {
 	//   Z' = Z*U*T
 	// Note that a = -1 for curve do255s.
 	// Cost: 4M+2S
-	t2.Sqr(&Q.u)            // t2 <- U^2
-	t1.Mul(&Q.z, &Q.t)      // t1 <- Z*T
-	tW.Lsh(&Q.x, 1)         // tW <- 2*X
-	tW.Sub(&tW, &Q.z)       // tW <- 2*X + a*Z
-	tX.Mul(&t1, &Q.t)       // tX <- Z*T^2
-	tW.Mul(&tW, &t2)        // tW <- (2*X + a*Z)*U^2
-	tZ.Mul(&t1, &Q.u)       // tZ <- Z*U*T
-	tW.Sub(&tX, &tW)        // tW <- Z*T^2 - (2*X + a*Z)*U^2
-	tX.Sqr(&tX)             // tX <- Z^2*T^4
+	t2.Sqr(&Q.u)       // t2 <- U^2
+	t1.Mul(&Q.z, &Q.t) // t1 <- Z*T
+	tW.Lsh(&Q.x, 1)    // tW <- 2*X
+	tW.Sub(&tW, &Q.z)  // tW <- 2*X + a*Z
+	tX.Mul(&t1, &Q.t)  // tX <- Z*T^2
+	tW.Mul(&tW, &t2)   // tW <- (2*X + a*Z)*U^2
+	tZ.Mul(&t1, &Q.u)  // tZ <- Z*U*T
+	tW.Sub(&tX, &tW)   // tW <- Z*T^2 - (2*X + a*Z)*U^2
+	tX.Sqr(&tX)        // tX <- Z^2*T^4
 
 	// Second half-doubling, with output in Jacobian (x, w)
 	//   X = 16*b*Z'^4
@@ -473,20 +473,20 @@ func (P *Do255sPoint) DoubleX(Q *Do255sPoint, n uint) *Do255sPoint {
 	//   Z = 2*W'*Z'
 	// With a = -1 and b = 1/2 for curve do255s.
 	// Cost: 4S
-	t1.Sqr(&tZ)             // t1 <- Z'^2
-	tZ.Add(&tW, &tZ)        // tZ <- W' + Z'
-	t2.Sqr(&tW)             // t2 <- W'^2
-	tW.Add(&tX, &t1)        // tW <- X' - a*Z'^2
-	tZ.Sqr(&tZ)             // tZ <- (W' + Z')^2
-	tW.Lsh(&tW, 1)          // tW <- 2*X' - 2*a*Z'^2
-	tX.Sqr(&t1)             // tX <- Z'^4
-	tW.Sub(&tW, &t2)        // tW <- 2*X' - 2*a*Z'^2 - W'^2
-	t2.Add(&t2, &t1)        // t2 <- W'^2 + Z'^2
-	tX.Lsh(&tX, 3)          // tX <- 16*b*Z'^4
-	tZ.Sub(&tZ, &t2)        // tZ <- 2*W'*Z'
+	t1.Sqr(&tZ)      // t1 <- Z'^2
+	tZ.Add(&tW, &tZ) // tZ <- W' + Z'
+	t2.Sqr(&tW)      // t2 <- W'^2
+	tW.Add(&tX, &t1) // tW <- X' - a*Z'^2
+	tZ.Sqr(&tZ)      // tZ <- (W' + Z')^2
+	tW.Lsh(&tW, 1)   // tW <- 2*X' - 2*a*Z'^2
+	tX.Sqr(&t1)      // tX <- Z'^4
+	tW.Sub(&tW, &t2) // tW <- 2*X' - 2*a*Z'^2 - W'^2
+	t2.Add(&t2, &t1) // t2 <- W'^2 + Z'^2
+	tX.Lsh(&tX, 3)   // tX <- 16*b*Z'^4
+	tZ.Sub(&tZ, &t2) // tZ <- 2*W'*Z'
 
 	// n-2 inner doublings in Jacobian (x, w) coordinates.
-	for n -= 2; n > 0; n -- {
+	for n -= 2; n > 0; n-- {
 		// Formulas:
 		//   X' = 16*b*(W*Z)^4
 		//   W' = -(W^4 - (a^2-4*b)*Z^4)
@@ -495,20 +495,20 @@ func (P *Do255sPoint) DoubleX(Q *Do255sPoint, n uint) *Do255sPoint {
 		//   W^4 - (a^2-4*b)*Z^4 = W^4 + Z^4
 		//                       = (W^2 - a*Z^2)^2 - 2*(W*Z)^2
 		// Cost: 2M+4S
-		t1.Mul(&tW, &tZ)      // t1 <- W*Z
-		tW.Add(&tW, &tZ)      // tW <- W + Z
-		tZ.Lsh(&tX, 1)        // tZ <- 2*X
-		t2.Sqr(&t1)           // t2 <- (W*Z)^2
-		t1.Lsh(&t1, 1)        // t1 <- 2*W*Z
-		tW.Sqr(&tW)           // tW <- (W + Z)^2
-		t2.Lsh(&t2, 1)        // t2 <- 2*(W*Z)^2
-		tW.Sub(&tW, &t1)      // tW <- W^2 - a*Z^2
-		tZ.Sub(&tZ, &tW)      // tZ <- 2*X + a*Z^2 - W^2
-		tW.Sqr(&tW)           // tW <- (W^2 - a*Z^2)^2
-		tZ.Mul(&tZ, &t1)      // tZ <- 2*W*Z*(2*X + a*Z^2 - W^2)
-		tW.Sub(&t2, &tW)      // tW <- -(W^4 - (a^2-4*b)*Z^4)
-		tX.Sqr(&t2)           // tX <- 4*(W*Z)^4
-		tX.Lsh(&tX, 1)        // tX <- 16*b*(W*Z)^4
+		t1.Mul(&tW, &tZ) // t1 <- W*Z
+		tW.Add(&tW, &tZ) // tW <- W + Z
+		tZ.Lsh(&tX, 1)   // tZ <- 2*X
+		t2.Sqr(&t1)      // t2 <- (W*Z)^2
+		t1.Lsh(&t1, 1)   // t1 <- 2*W*Z
+		tW.Sqr(&tW)      // tW <- (W + Z)^2
+		t2.Lsh(&t2, 1)   // t2 <- 2*(W*Z)^2
+		tW.Sub(&tW, &t1) // tW <- W^2 - a*Z^2
+		tZ.Sub(&tZ, &tW) // tZ <- 2*X + a*Z^2 - W^2
+		tW.Sqr(&tW)      // tW <- (W^2 - a*Z^2)^2
+		tZ.Mul(&tZ, &t1) // tZ <- 2*W*Z*(2*X + a*Z^2 - W^2)
+		tW.Sub(&t2, &tW) // tW <- -(W^4 - (a^2-4*b)*Z^4)
+		tX.Sqr(&t2)      // tX <- 4*(W*Z)^4
+		tX.Lsh(&tX, 1)   // tX <- 16*b*(W*Z)^4
 	}
 
 	// Final doubling with conversion back into fractional coordinates.
@@ -517,19 +517,19 @@ func (P *Do255sPoint) DoubleX(Q *Do255sPoint, n uint) *Do255sPoint {
 	//   U' = 2*W*Z*(2*X + a*Z^2 - W^2)
 	//   T' = -(W^4 - (a^2-4*b)*Z^4)
 	// Cost: 2M+4S
-	t1.Mul(&tW, &tZ)      // t1 <- W*Z
-	tW.Add(&tW, &tZ)      // tW <- W + Z
-	tZ.Lsh(&tX, 1)        // tZ <- 2*X
-	t2.Sqr(&t1)           // t2 <- (W*Z)^2
-	t1.Lsh(&t1, 1)        // t1 <- 2*W*Z
-	tW.Sqr(&tW)           // tW <- (W + Z)^2
-	P.x.Lsh(&t2, 1)       // X' <- 4*b*(W*Z)^2
-	tW.Sub(&tW, &t1)      // tW <- W^2 - a*Z^2
-	tZ.Sub(&tZ, &tW)      // tZ <- 2*X + a*Z^2 - W^2
-	tW.Sqr(&tW)           // tW <- W^4 - (a^2-4*b)*Z^4 + 2*(W*Z)^2
-	P.u.Mul(&t1, &tZ)     // U' <- 2*W*Z*(2*X + a*Z^2 - W^2)
-	P.z.Sqr(&tZ)          // Z' <- (2*X + a*Z^2 - W^2)^2
-	P.t.Sub(&P.x, &tW)    // T' <- -(W^4 - (a^2-4*b)*Z^4)
+	t1.Mul(&tW, &tZ)   // t1 <- W*Z
+	tW.Add(&tW, &tZ)   // tW <- W + Z
+	tZ.Lsh(&tX, 1)     // tZ <- 2*X
+	t2.Sqr(&t1)        // t2 <- (W*Z)^2
+	t1.Lsh(&t1, 1)     // t1 <- 2*W*Z
+	tW.Sqr(&tW)        // tW <- (W + Z)^2
+	P.x.Lsh(&t2, 1)    // X' <- 4*b*(W*Z)^2
+	tW.Sub(&tW, &t1)   // tW <- W^2 - a*Z^2
+	tZ.Sub(&tZ, &tW)   // tZ <- 2*X + a*Z^2 - W^2
+	tW.Sqr(&tW)        // tW <- W^4 - (a^2-4*b)*Z^4 + 2*(W*Z)^2
+	P.u.Mul(&t1, &tZ)  // U' <- 2*W*Z*(2*X + a*Z^2 - W^2)
+	P.z.Sqr(&tZ)       // Z' <- (2*X + a*Z^2 - W^2)^2
+	P.t.Sub(&P.x, &tW) // T' <- -(W^4 - (a^2-4*b)*Z^4)
 
 	return P
 }
@@ -556,19 +556,19 @@ func (P *Do255sPoint) Mul(Q *Do255sPoint, n *Do255sScalar) *Do255sPoint {
 	win[0] = *Q
 	win[1].Double(Q)
 	for i := 3; i <= 15; i += 2 {
-		win[i - 1].Add(&win[i - 2], Q)
-		win[i].Double(&win[((i + 1) >> 1) - 1])
+		win[i-1].Add(&win[i-2], Q)
+		win[i].Double(&win[((i+1)>>1)-1])
 	}
 
 	// Use the top digit to initialize the accumulator point M.
 	P.do255sLookupWindow(&win, uint(sd[51]))
 
 	// Process other digits from top to bottom.
-	for i := 50; i >= 0; i -- {
+	for i := 50; i >= 0; i-- {
 		P.DoubleX(P, 5)
 		var M Do255sPoint
-		M.do255sLookupWindow(&win, uint(sd[i] & 0x1F))
-		M.u.CondNeg(&M.u, uint64(sd[i] >> 7))
+		M.do255sLookupWindow(&win, uint(sd[i]&0x1F))
+		M.u.CondNeg(&M.u, uint64(sd[i]>>7))
 		P.Add(P, &M)
 	}
 
@@ -594,32 +594,32 @@ func (P *Do255sPoint) MulGen(n *Do255sScalar) *Do255sPoint {
 
 	// Add points corresponding to top digits of the three other
 	// quarter-scalars.
-	Ma.do255sLookupWindowAffine(&do255sWin_G_xu, uint(sd[12] & 0x1F))
-	Ma.u.CondNeg(&Ma.u, uint64(sd[12] >> 7))
+	Ma.do255sLookupWindowAffine(&do255sWin_G_xu, uint(sd[12]&0x1F))
+	Ma.u.CondNeg(&Ma.u, uint64(sd[12]>>7))
 	P.addMixed(P, &Ma)
-	Ma.do255sLookupWindowAffine(&do255sWin_G65_xu, uint(sd[25] & 0x1F))
-	Ma.u.CondNeg(&Ma.u, uint64(sd[25] >> 7))
+	Ma.do255sLookupWindowAffine(&do255sWin_G65_xu, uint(sd[25]&0x1F))
+	Ma.u.CondNeg(&Ma.u, uint64(sd[25]>>7))
 	P.addMixed(P, &Ma)
-	Ma.do255sLookupWindowAffine(&do255sWin_G130_xu, uint(sd[38] & 0x1F))
-	Ma.u.CondNeg(&Ma.u, uint64(sd[38] >> 7))
+	Ma.do255sLookupWindowAffine(&do255sWin_G130_xu, uint(sd[38]&0x1F))
+	Ma.u.CondNeg(&Ma.u, uint64(sd[38]>>7))
 	P.addMixed(P, &Ma)
 
 	// Process all other digits from high to low. We process the
 	// four quarter-scalars in parallel.
-	for i := 11; i >= 0; i -- {
+	for i := 11; i >= 0; i-- {
 		P.DoubleX(P, 5)
 
-		Ma.do255sLookupWindowAffine(&do255sWin_G_xu, uint(sd[i] & 0x1F))
-		Ma.u.CondNeg(&Ma.u, uint64(sd[i] >> 7))
+		Ma.do255sLookupWindowAffine(&do255sWin_G_xu, uint(sd[i]&0x1F))
+		Ma.u.CondNeg(&Ma.u, uint64(sd[i]>>7))
 		P.addMixed(P, &Ma)
-		Ma.do255sLookupWindowAffine(&do255sWin_G65_xu, uint(sd[i + 13] & 0x1F))
-		Ma.u.CondNeg(&Ma.u, uint64(sd[i + 13] >> 7))
+		Ma.do255sLookupWindowAffine(&do255sWin_G65_xu, uint(sd[i+13]&0x1F))
+		Ma.u.CondNeg(&Ma.u, uint64(sd[i+13]>>7))
 		P.addMixed(P, &Ma)
-		Ma.do255sLookupWindowAffine(&do255sWin_G130_xu, uint(sd[i + 26] & 0x1F))
-		Ma.u.CondNeg(&Ma.u, uint64(sd[i + 26] >> 7))
+		Ma.do255sLookupWindowAffine(&do255sWin_G130_xu, uint(sd[i+26]&0x1F))
+		Ma.u.CondNeg(&Ma.u, uint64(sd[i+26]>>7))
 		P.addMixed(P, &Ma)
-		Ma.do255sLookupWindowAffine(&do255sWin_G195_xu, uint(sd[i + 39] & 0x1F))
-		Ma.u.CondNeg(&Ma.u, uint64(sd[i + 39] >> 7))
+		Ma.do255sLookupWindowAffine(&do255sWin_G195_xu, uint(sd[i+39]&0x1F))
+		Ma.u.CondNeg(&Ma.u, uint64(sd[i+39]>>7))
 		P.addMixed(P, &Ma)
 	}
 
@@ -638,8 +638,8 @@ func (P *Do255sPoint) do255sLookupWindow(win *[16]Do255sPoint, index uint) {
 	P.t = gf.GF255s_ZERO
 
 	// Lookup all values.
-	for i := 0; i < 16; i ++ {
-		m := int64(index) - int64(i + 1)
+	for i := 0; i < 16; i++ {
+		m := int64(index) - int64(i+1)
 		mm := ^uint64((m | -m) >> 63)
 		P.x.CondOrFrom(&win[i].x, mm)
 		P.z.CondOrFrom(&win[i].z, mm)
@@ -663,8 +663,8 @@ func (P *do255sPointAffine) do255sLookupWindowAffine(win *[16]do255sPointAffine,
 	P.u = gf.GF255s_ZERO
 
 	// Lookup all values.
-	for i := 0; i < 16; i ++ {
-		m := int64(index) - int64(i + 1)
+	for i := 0; i < 16; i++ {
+		m := int64(index) - int64(i+1)
 		mm := ^uint64((m | -m) >> 63)
 		P.x.CondOrFrom(&win[i].x, mm)
 		P.u.CondOrFrom(&win[i].u, mm)
@@ -677,9 +677,9 @@ func (P *Do255sPoint) addFromWindowVartime(win *[16]Do255sPoint, ej byte) {
 	j := int(ej & 0x1F)
 	if j != 0 {
 		if ej < 0x80 {
-			P.Add(P, &win[j - 1])
+			P.Add(P, &win[j-1])
 		} else {
-			P.Sub(P, &win[j - 1])
+			P.Sub(P, &win[j-1])
 		}
 	}
 }
@@ -690,9 +690,9 @@ func (P *Do255sPoint) addFromWindowAffineVartime(win *[16]do255sPointAffine, ej 
 	j := int(ej & 0x1F)
 	if j != 0 {
 		if ej < 0x80 {
-			P.addMixed(P, &win[j - 1])
+			P.addMixed(P, &win[j-1])
 		} else {
-			P.subMixed(P, &win[j - 1])
+			P.subMixed(P, &win[j-1])
 		}
 	}
 }
@@ -740,13 +740,13 @@ func (P *Do255sPoint) VerifyHelperVartime(k0, k1 *Do255sScalar, encR []byte) boo
 	}
 	winP[1].Double(&winP[0])
 	for i := 3; i <= 15; i += 2 {
-		winP[i - 1].Add(&winP[i - 2], &winP[0])
-		winP[i].Double(&winP[((i + 1) >> 1) - 1])
+		winP[i-1].Add(&winP[i-2], &winP[0])
+		winP[i].Double(&winP[((i+1)>>1)-1])
 	}
 	winR[1].Double(&winR[0])
 	for i := 3; i <= 15; i += 2 {
-		winR[i - 1].Add(&winR[i - 2], &winR[0])
-		winR[i].Double(&winR[((i + 1) >> 1) - 1])
+		winR[i-1].Add(&winR[i-2], &winR[0])
+		winR[i].Double(&winR[((i+1)>>1)-1])
 	}
 
 	// Recode scalars. We need k0*c1 mod r. Do not forget the sign
@@ -768,7 +768,7 @@ func (P *Do255sPoint) VerifyHelperVartime(k0, k1 *Do255sScalar, encR []byte) boo
 	// non-negative) and add points from the other windows.
 	var M Do255sPoint
 	if sdP[25] != 0 {
-		M = winP[int(sdP[25]) - 1]
+		M = winP[int(sdP[25])-1]
 	} else {
 		M = do255sNeutral
 	}
@@ -777,12 +777,12 @@ func (P *Do255sPoint) VerifyHelperVartime(k0, k1 *Do255sScalar, encR []byte) boo
 	M.addFromWindowAffineVartime(&do255sWin_G130_xu, sd0[51])
 
 	// Process all other digits.
-	for i := 24; i >= 0; i -- {
+	for i := 24; i >= 0; i-- {
 		M.DoubleX(&M, 5)
 		M.addFromWindowVartime(&winP, sdP[i])
 		M.addFromWindowVartime(&winR, sdR[i])
 		M.addFromWindowAffineVartime(&do255sWin_G_xu, sd0[i])
-		M.addFromWindowAffineVartime(&do255sWin_G130_xu, sd0[26 + i])
+		M.addFromWindowAffineVartime(&do255sWin_G130_xu, sd0[26+i])
 	}
 
 	// Signature is valid if and only if the final output is the
@@ -802,7 +802,7 @@ func (P *Do255sPoint) VerifyHelper(k0, k1 *Do255sScalar, encR []byte) int {
 	var encT [32]byte
 	P1.Encode(encT[:0])
 	var tt int = 0
-	for i := 0; i < 32; i ++ {
+	for i := 0; i < 32; i++ {
 		tt |= int(encR[i] ^ encT[i])
 	}
 	return 1 - ((tt + 0xFF) >> 8)
@@ -886,7 +886,7 @@ func (P *Do255sPoint) MapBytes(bb []byte) *Do255sPoint {
 	Z.Sub(&gf.GF255s_ONE, &e2)
 	U.Mul(&X, &Z)
 	T.Select(&yy1num, &yy2num, qr1).Sqrt(&T)
-	T.CondNeg(&T, 1 - qr1)
+	T.CondNeg(&T, 1-qr1)
 
 	// If e == +/- 1, then (X:Z:U:T) == (0:0:0:0)
 	// If e == 0, then (X:Z:U:T) == (0:1:0:0)
@@ -920,462 +920,462 @@ func (P *Do255sPoint) MapBytes(bb []byte) *Do255sPoint {
 //   i*2^130*G   for i = 1..16
 //   i*2^195*G   for i = 1..16
 
-var do255sWin_G_xu = [16]do255sPointAffine {
+var do255sWin_G_xu = [16]do255sPointAffine{
 	/* 1 */
 	{
-		x: gf.GF255s { 0x4803AC7D33B156B1, 0x3EF832265840B591,
-		               0x213759ECCB010B9D, 0x39BD72651783FB6D },
-		u: gf.GF255s { 0x0000000000000003, 0x0000000000000000,
-		               0x0000000000000000, 0x0000000000000000 },
+		x: gf.GF255s{0x4803AC7D33B156B1, 0x3EF832265840B591,
+			0x213759ECCB010B9D, 0x39BD72651783FB6D},
+		u: gf.GF255s{0x0000000000000003, 0x0000000000000000,
+			0x0000000000000000, 0x0000000000000000},
 	},
 	/* 2 */
 	{
-		x: gf.GF255s { 0x8C6318C6318C5721, 0x18C6318C6318C631,
-		               0x318C6318C6318C63, 0x6318C6318C6318C6 },
-		u: gf.GF255s { 0xB3E22F8D0D1657FC, 0xE5427944219E490E,
-		               0x256C2BE75887FD30, 0x6F44EC749C5869ED },
+		x: gf.GF255s{0x8C6318C6318C5721, 0x18C6318C6318C631,
+			0x318C6318C6318C63, 0x6318C6318C6318C6},
+		u: gf.GF255s{0xB3E22F8D0D1657FC, 0xE5427944219E490E,
+			0x256C2BE75887FD30, 0x6F44EC749C5869ED},
 	},
 	/* 3 */
 	{
-		x: gf.GF255s { 0xC92EA6A45AF542C8, 0xACA2B1F0EB2EBB62,
-		               0x16AA9AB4772D49BF, 0x586E82D468993FDF },
-		u: gf.GF255s { 0x7204233F36F06441, 0x36F07204233F36F0,
-		               0x233F36F07204233F, 0x7204233F36F07204 },
+		x: gf.GF255s{0xC92EA6A45AF542C8, 0xACA2B1F0EB2EBB62,
+			0x16AA9AB4772D49BF, 0x586E82D468993FDF},
+		u: gf.GF255s{0x7204233F36F06441, 0x36F07204233F36F0,
+			0x233F36F07204233F, 0x7204233F36F07204},
 	},
 	/* 4 */
 	{
-		x: gf.GF255s { 0xB21E437C0F24B43F, 0xE352D46A2A191529,
-		               0x5105F27F8E691D57, 0x203E742185ABD1BC },
-		u: gf.GF255s { 0x9204A59E69223E39, 0x4E645F874B12D8E7,
-		               0xF2A1145C9F5D3475, 0x54E64904662F1657 },
+		x: gf.GF255s{0xB21E437C0F24B43F, 0xE352D46A2A191529,
+			0x5105F27F8E691D57, 0x203E742185ABD1BC},
+		u: gf.GF255s{0x9204A59E69223E39, 0x4E645F874B12D8E7,
+			0xF2A1145C9F5D3475, 0x54E64904662F1657},
 	},
 	/* 5 */
 	{
-		x: gf.GF255s { 0xD4C604388FAAFD54, 0x478144CACA27D2A0,
-		               0x4B4B7554A3381C38, 0x78CC3E71A8C94117 },
-		u: gf.GF255s { 0xDF0337C00667B64D, 0x58856B292FBA673A,
-		               0xC17C3E9333A6D7CE, 0x52932B9A9F0CC65D },
+		x: gf.GF255s{0xD4C604388FAAFD54, 0x478144CACA27D2A0,
+			0x4B4B7554A3381C38, 0x78CC3E71A8C94117},
+		u: gf.GF255s{0xDF0337C00667B64D, 0x58856B292FBA673A,
+			0xC17C3E9333A6D7CE, 0x52932B9A9F0CC65D},
 	},
 	/* 6 */
 	{
-		x: gf.GF255s { 0x0F8CCA9A5D8AEC75, 0x2337B2C5F00CFF35,
-		               0x4C38E25760F3A520, 0x5B8B19C1B38EC25A },
-		u: gf.GF255s { 0x2378FCE7659F8304, 0xF71199A7E92DA598,
-		               0x05D59CECEE1D7E76, 0x7B55CE1D18E39726 },
+		x: gf.GF255s{0x0F8CCA9A5D8AEC75, 0x2337B2C5F00CFF35,
+			0x4C38E25760F3A520, 0x5B8B19C1B38EC25A},
+		u: gf.GF255s{0x2378FCE7659F8304, 0xF71199A7E92DA598,
+			0x05D59CECEE1D7E76, 0x7B55CE1D18E39726},
 	},
 	/* 7 */
 	{
-		x: gf.GF255s { 0xE45744799916AE56, 0xAB719188444F94C0,
-		               0x8BCF3B53F4727AB0, 0x239A8F014119EE4B },
-		u: gf.GF255s { 0xBB70A3099712F248, 0x62AE8CABB5C7CED6,
-		               0x150E35D2C3D060D0, 0x6EB76B2647D95DA4 },
+		x: gf.GF255s{0xE45744799916AE56, 0xAB719188444F94C0,
+			0x8BCF3B53F4727AB0, 0x239A8F014119EE4B},
+		u: gf.GF255s{0xBB70A3099712F248, 0x62AE8CABB5C7CED6,
+			0x150E35D2C3D060D0, 0x6EB76B2647D95DA4},
 	},
 	/* 8 */
 	{
-		x: gf.GF255s { 0x486D0418D4089F3F, 0x415C30647E21EC49,
-		               0xDB2F693C6C060489, 0x475F06F55E1CF582 },
-		u: gf.GF255s { 0x2DE04D6F93F6EEA0, 0x13A2A2DE4BD9AB93,
-		               0x4BA8485FACF9CC03, 0x26DCD74FEC331ED1 },
+		x: gf.GF255s{0x486D0418D4089F3F, 0x415C30647E21EC49,
+			0xDB2F693C6C060489, 0x475F06F55E1CF582},
+		u: gf.GF255s{0x2DE04D6F93F6EEA0, 0x13A2A2DE4BD9AB93,
+			0x4BA8485FACF9CC03, 0x26DCD74FEC331ED1},
 	},
 	/* 9 */
 	{
-		x: gf.GF255s { 0x6F20F664F35EBE0B, 0x72C56CBCBBE70025,
-		               0x1B8A888E7A1BC6B3, 0x3AE1B93B4536C750 },
-		u: gf.GF255s { 0xF293B01428B2AEF7, 0x6544BF679F64AADF,
-		               0xC25DB7DB3DC0038B, 0x641BC3EAE8B16348 },
+		x: gf.GF255s{0x6F20F664F35EBE0B, 0x72C56CBCBBE70025,
+			0x1B8A888E7A1BC6B3, 0x3AE1B93B4536C750},
+		u: gf.GF255s{0xF293B01428B2AEF7, 0x6544BF679F64AADF,
+			0xC25DB7DB3DC0038B, 0x641BC3EAE8B16348},
 	},
 	/* 10 */
 	{
-		x: gf.GF255s { 0x0B77022F05D906A1, 0x36553987A9763928,
-		               0x90C0593CD952E579, 0x601889E506ECA253 },
-		u: gf.GF255s { 0xAC2450CD35E0E33E, 0xA5FBAFCA4BE098FF,
-		               0x15C5CFFBF6CC3634, 0x11EB002E4DD0CC8A },
+		x: gf.GF255s{0x0B77022F05D906A1, 0x36553987A9763928,
+			0x90C0593CD952E579, 0x601889E506ECA253},
+		u: gf.GF255s{0xAC2450CD35E0E33E, 0xA5FBAFCA4BE098FF,
+			0x15C5CFFBF6CC3634, 0x11EB002E4DD0CC8A},
 	},
 	/* 11 */
 	{
-		x: gf.GF255s { 0xFC96E106BF390F8E, 0x87F4FE12D17AC934,
-		               0x20DD4A1C455D2425, 0x0F489EA0CF96C239 },
-		u: gf.GF255s { 0x4845EE2F9FDD13DE, 0x343EAC1284D73CA8,
-		               0xD7761D7533C3A9ED, 0x44204FCFD6AF1B44 },
+		x: gf.GF255s{0xFC96E106BF390F8E, 0x87F4FE12D17AC934,
+			0x20DD4A1C455D2425, 0x0F489EA0CF96C239},
+		u: gf.GF255s{0x4845EE2F9FDD13DE, 0x343EAC1284D73CA8,
+			0xD7761D7533C3A9ED, 0x44204FCFD6AF1B44},
 	},
 	/* 12 */
 	{
-		x: gf.GF255s { 0x116E4C0180B4DDCF, 0xD965D1AE088C285B,
-		               0xCE5A14DBF0E43F69, 0x2BCC8378CC7BF398 },
-		u: gf.GF255s { 0xEDFD8B4BAD8160D1, 0x9BBB9D365457C4A7,
-		               0xC2A3F9623BA7F9DB, 0x1EA722FF296F8D92 },
+		x: gf.GF255s{0x116E4C0180B4DDCF, 0xD965D1AE088C285B,
+			0xCE5A14DBF0E43F69, 0x2BCC8378CC7BF398},
+		u: gf.GF255s{0xEDFD8B4BAD8160D1, 0x9BBB9D365457C4A7,
+			0xC2A3F9623BA7F9DB, 0x1EA722FF296F8D92},
 	},
 	/* 13 */
 	{
-		x: gf.GF255s { 0xBB832D11959A60E5, 0xF3AF5A147660C5E6,
-		               0x1037C50FE1FAFA73, 0x251739F159A18E7B },
-		u: gf.GF255s { 0x4DEC233876049D71, 0x12E5410DA8EA7661,
-		               0xA8C80C9E1E78A79B, 0x56187141071FC1D5 },
+		x: gf.GF255s{0xBB832D11959A60E5, 0xF3AF5A147660C5E6,
+			0x1037C50FE1FAFA73, 0x251739F159A18E7B},
+		u: gf.GF255s{0x4DEC233876049D71, 0x12E5410DA8EA7661,
+			0xA8C80C9E1E78A79B, 0x56187141071FC1D5},
 	},
 	/* 14 */
 	{
-		x: gf.GF255s { 0x238B24170CD243C2, 0xF20B2474CC7B0C22,
-		               0xD1AF972D83B667A6, 0x1BC20D835A45EA4E },
-		u: gf.GF255s { 0x0693069387390957, 0xC3E0CD34567E3C9A,
-		               0x2EDB82538E0CEEAE, 0x60EF0D216D3123EB },
+		x: gf.GF255s{0x238B24170CD243C2, 0xF20B2474CC7B0C22,
+			0xD1AF972D83B667A6, 0x1BC20D835A45EA4E},
+		u: gf.GF255s{0x0693069387390957, 0xC3E0CD34567E3C9A,
+			0x2EDB82538E0CEEAE, 0x60EF0D216D3123EB},
 	},
 	/* 15 */
 	{
-		x: gf.GF255s { 0x725096F4FAC9FD25, 0x4072199CA8F661BC,
-		               0x1E3D756A54E4B489, 0x36A82923B7C5D81C },
-		u: gf.GF255s { 0x3010093957EA5D5A, 0x99E3DE25AE95E20B,
-		               0x5594A4E0449B9EFD, 0x100615BCCFB9A5A5 },
+		x: gf.GF255s{0x725096F4FAC9FD25, 0x4072199CA8F661BC,
+			0x1E3D756A54E4B489, 0x36A82923B7C5D81C},
+		u: gf.GF255s{0x3010093957EA5D5A, 0x99E3DE25AE95E20B,
+			0x5594A4E0449B9EFD, 0x100615BCCFB9A5A5},
 	},
 	/* 16 */
 	{
-		x: gf.GF255s { 0x6ACF66F7D508BB00, 0xFC3A8030127F8808,
-		               0x70481A4C6305A579, 0x30664839BD04AA0E },
-		u: gf.GF255s { 0xFE9991C8BEE08226, 0x70631241B6132ED0,
-		               0xF17032C1930CC3DF, 0x1880F6E65E61EDCA },
+		x: gf.GF255s{0x6ACF66F7D508BB00, 0xFC3A8030127F8808,
+			0x70481A4C6305A579, 0x30664839BD04AA0E},
+		u: gf.GF255s{0xFE9991C8BEE08226, 0x70631241B6132ED0,
+			0xF17032C1930CC3DF, 0x1880F6E65E61EDCA},
 	},
 }
 
-var do255sWin_G65_xu = [16]do255sPointAffine {
+var do255sWin_G65_xu = [16]do255sPointAffine{
 	/* 1 */
 	{
-		x: gf.GF255s { 0xE3AD260DF7B2D34D, 0xEF4C98E564E44AEC,
-		               0x41B749AF25234018, 0x0722EF995D77E307 },
-		u: gf.GF255s { 0xC504DF70301870EC, 0xC3F5757559BEB30B,
-		               0x59EF9CAA0E041627, 0x3AA6C1241FDF29EA },
+		x: gf.GF255s{0xE3AD260DF7B2D34D, 0xEF4C98E564E44AEC,
+			0x41B749AF25234018, 0x0722EF995D77E307},
+		u: gf.GF255s{0xC504DF70301870EC, 0xC3F5757559BEB30B,
+			0x59EF9CAA0E041627, 0x3AA6C1241FDF29EA},
 	},
 	/* 2 */
 	{
-		x: gf.GF255s { 0x2ADA4E59EECB8F77, 0xD577FCEA354A3FA3,
-		               0xE3E9AA4AC41ABDB8, 0x0FA4D0D00D3E7390 },
-		u: gf.GF255s { 0xE395C342A49AB090, 0xBEEAEA12D994BBBA,
-		               0xE555C4B2316756DE, 0x0C4B1FDF2A2835EA },
+		x: gf.GF255s{0x2ADA4E59EECB8F77, 0xD577FCEA354A3FA3,
+			0xE3E9AA4AC41ABDB8, 0x0FA4D0D00D3E7390},
+		u: gf.GF255s{0xE395C342A49AB090, 0xBEEAEA12D994BBBA,
+			0xE555C4B2316756DE, 0x0C4B1FDF2A2835EA},
 	},
 	/* 3 */
 	{
-		x: gf.GF255s { 0x83437B3B44A76584, 0x85337A5B5EA37019,
-		               0x0AF40A3CBACBCA6E, 0x6129FB017ECE3AE0 },
-		u: gf.GF255s { 0xDD2736E064D47F35, 0x8235DE8C4CCCB7AD,
-		               0x84993635937FCD8B, 0x05DADA9DFEACCC60 },
+		x: gf.GF255s{0x83437B3B44A76584, 0x85337A5B5EA37019,
+			0x0AF40A3CBACBCA6E, 0x6129FB017ECE3AE0},
+		u: gf.GF255s{0xDD2736E064D47F35, 0x8235DE8C4CCCB7AD,
+			0x84993635937FCD8B, 0x05DADA9DFEACCC60},
 	},
 	/* 4 */
 	{
-		x: gf.GF255s { 0x417B5BE5A8BA33DF, 0x1146B966C729E5BE,
-		               0xF19DEF75C9837F83, 0x4B20562C0C99B2FC },
-		u: gf.GF255s { 0x20CCC8942E0DD4AF, 0xB05A144640E6146F,
-		               0x39FB3501747B5584, 0x637DD68BAA0DCC5D },
+		x: gf.GF255s{0x417B5BE5A8BA33DF, 0x1146B966C729E5BE,
+			0xF19DEF75C9837F83, 0x4B20562C0C99B2FC},
+		u: gf.GF255s{0x20CCC8942E0DD4AF, 0xB05A144640E6146F,
+			0x39FB3501747B5584, 0x637DD68BAA0DCC5D},
 	},
 	/* 5 */
 	{
-		x: gf.GF255s { 0x683D5AAFCFBCBF77, 0xB0B9F38491FC818E,
-		               0x8DDC79CDFA3B9EB3, 0x406A80209ECB5A2E },
-		u: gf.GF255s { 0x8E3257DDE0B61BA4, 0x034912BE87333A80,
-		               0x355389746FE3860D, 0x0430DD4DB72FDAE3 },
+		x: gf.GF255s{0x683D5AAFCFBCBF77, 0xB0B9F38491FC818E,
+			0x8DDC79CDFA3B9EB3, 0x406A80209ECB5A2E},
+		u: gf.GF255s{0x8E3257DDE0B61BA4, 0x034912BE87333A80,
+			0x355389746FE3860D, 0x0430DD4DB72FDAE3},
 	},
 	/* 6 */
 	{
-		x: gf.GF255s { 0xE7DCEDC9830F3BCC, 0x3190BB8BF13D83C2,
-		               0xB348EAB92E361E5B, 0x21A00B1A4B6B4CCB },
-		u: gf.GF255s { 0x41C6037317995DE4, 0xEB9F7DAEFD0E5177,
-		               0x3C89F25AEBEFEA23, 0x6BC51220E2A6FEA1 },
+		x: gf.GF255s{0xE7DCEDC9830F3BCC, 0x3190BB8BF13D83C2,
+			0xB348EAB92E361E5B, 0x21A00B1A4B6B4CCB},
+		u: gf.GF255s{0x41C6037317995DE4, 0xEB9F7DAEFD0E5177,
+			0x3C89F25AEBEFEA23, 0x6BC51220E2A6FEA1},
 	},
 	/* 7 */
 	{
-		x: gf.GF255s { 0x118E74003C58146D, 0x4E183A0D59D45A86,
-		               0x88CF58B85D8DD179, 0x1FCC2FD8D59414BA },
-		u: gf.GF255s { 0x6E0C6EC00B45CB36, 0xDE22614DA09D7B7D,
-		               0x68532DB386C5311B, 0x6C76A36690BF3721 },
+		x: gf.GF255s{0x118E74003C58146D, 0x4E183A0D59D45A86,
+			0x88CF58B85D8DD179, 0x1FCC2FD8D59414BA},
+		u: gf.GF255s{0x6E0C6EC00B45CB36, 0xDE22614DA09D7B7D,
+			0x68532DB386C5311B, 0x6C76A36690BF3721},
 	},
 	/* 8 */
 	{
-		x: gf.GF255s { 0xAB758A963FCB67D3, 0xBDBFF8BDCDDC7179,
-		               0x63A4D2686CFABF15, 0x63CC5473DD3F5036 },
-		u: gf.GF255s { 0xCF5B38B898027EEE, 0x2E0E5F286C358DFB,
-		               0x77F9F481B54C83A0, 0x320289A4D4AD38D8 },
+		x: gf.GF255s{0xAB758A963FCB67D3, 0xBDBFF8BDCDDC7179,
+			0x63A4D2686CFABF15, 0x63CC5473DD3F5036},
+		u: gf.GF255s{0xCF5B38B898027EEE, 0x2E0E5F286C358DFB,
+			0x77F9F481B54C83A0, 0x320289A4D4AD38D8},
 	},
 	/* 9 */
 	{
-		x: gf.GF255s { 0x9AFED28D850C23A5, 0x4E28F84F5436536D,
-		               0x493B602C85203364, 0x0A73A163C1F86147 },
-		u: gf.GF255s { 0xE9F73ACE30D70239, 0x2D6EB28373FFD2AB,
-		               0xE362CB1B14264D84, 0x6A58C4C447F58EDA },
+		x: gf.GF255s{0x9AFED28D850C23A5, 0x4E28F84F5436536D,
+			0x493B602C85203364, 0x0A73A163C1F86147},
+		u: gf.GF255s{0xE9F73ACE30D70239, 0x2D6EB28373FFD2AB,
+			0xE362CB1B14264D84, 0x6A58C4C447F58EDA},
 	},
 	/* 10 */
 	{
-		x: gf.GF255s { 0x6D73DF10948A18DB, 0xCE6F829C7226AFF4,
-		               0x27E81B57F40362F2, 0x37BFD38BEC948817 },
-		u: gf.GF255s { 0xBD4ABD3A1D23F58F, 0xFDF2BE7E13D824B7,
-		               0xFDF4EBAD6DA9D7C5, 0x6F6BF0FD0A760CE6 },
+		x: gf.GF255s{0x6D73DF10948A18DB, 0xCE6F829C7226AFF4,
+			0x27E81B57F40362F2, 0x37BFD38BEC948817},
+		u: gf.GF255s{0xBD4ABD3A1D23F58F, 0xFDF2BE7E13D824B7,
+			0xFDF4EBAD6DA9D7C5, 0x6F6BF0FD0A760CE6},
 	},
 	/* 11 */
 	{
-		x: gf.GF255s { 0x511B8BB2C326919C, 0x36D06F274827CD94,
-		               0xFA874F760A089D6F, 0x796CE68B71B33782 },
-		u: gf.GF255s { 0xAC82BC835BEF5D82, 0x1ED56E4F26768EEA,
-		               0x7CB1DF78AE0F6520, 0x3F27081B1A793D69 },
+		x: gf.GF255s{0x511B8BB2C326919C, 0x36D06F274827CD94,
+			0xFA874F760A089D6F, 0x796CE68B71B33782},
+		u: gf.GF255s{0xAC82BC835BEF5D82, 0x1ED56E4F26768EEA,
+			0x7CB1DF78AE0F6520, 0x3F27081B1A793D69},
 	},
 	/* 12 */
 	{
-		x: gf.GF255s { 0x5C39D1FD89DD2FE7, 0x56D5F374BD997B36,
-		               0xCBC4F497125C9FBD, 0x2EF79073F850836A },
-		u: gf.GF255s { 0x3C2CD45E00488C1B, 0x744209C1D5AA1E98,
-		               0xB0A6FCE83F628FFF, 0x770D858C1138F9B1 },
+		x: gf.GF255s{0x5C39D1FD89DD2FE7, 0x56D5F374BD997B36,
+			0xCBC4F497125C9FBD, 0x2EF79073F850836A},
+		u: gf.GF255s{0x3C2CD45E00488C1B, 0x744209C1D5AA1E98,
+			0xB0A6FCE83F628FFF, 0x770D858C1138F9B1},
 	},
 	/* 13 */
 	{
-		x: gf.GF255s { 0x77ACC4B81316F86D, 0x69DD38B0F257E592,
-		               0x0F58657B866FB0D8, 0x3C39314BB1A846EE },
-		u: gf.GF255s { 0x2B0FECC1159B7C7E, 0x5176B2243AD75522,
-		               0xF578275E6C3BD8ED, 0x3EA45CDA4A4335B5 },
+		x: gf.GF255s{0x77ACC4B81316F86D, 0x69DD38B0F257E592,
+			0x0F58657B866FB0D8, 0x3C39314BB1A846EE},
+		u: gf.GF255s{0x2B0FECC1159B7C7E, 0x5176B2243AD75522,
+			0xF578275E6C3BD8ED, 0x3EA45CDA4A4335B5},
 	},
 	/* 14 */
 	{
-		x: gf.GF255s { 0xCE74D3864A444AF9, 0x0C0F7567E10119D1,
-		               0x1A156CF7026B694A, 0x33D0491E8BCF686E },
-		u: gf.GF255s { 0xDCABCD1C2B792081, 0xC0B470A297317B12,
-		               0xB2C96A085D26A03D, 0x52A2BF2E7D7202E9 },
+		x: gf.GF255s{0xCE74D3864A444AF9, 0x0C0F7567E10119D1,
+			0x1A156CF7026B694A, 0x33D0491E8BCF686E},
+		u: gf.GF255s{0xDCABCD1C2B792081, 0xC0B470A297317B12,
+			0xB2C96A085D26A03D, 0x52A2BF2E7D7202E9},
 	},
 	/* 15 */
 	{
-		x: gf.GF255s { 0x5D0726CD57A859A3, 0x39BB1C2D84086050,
-		               0x25E41A2638CFB70C, 0x455E456EBF8F2E0B },
-		u: gf.GF255s { 0xCB4E8E8682ED1F56, 0x95E7B3DAE6F438C6,
-		               0x436574C311E4EAE5, 0x5B29A9D46B6557D1 },
+		x: gf.GF255s{0x5D0726CD57A859A3, 0x39BB1C2D84086050,
+			0x25E41A2638CFB70C, 0x455E456EBF8F2E0B},
+		u: gf.GF255s{0xCB4E8E8682ED1F56, 0x95E7B3DAE6F438C6,
+			0x436574C311E4EAE5, 0x5B29A9D46B6557D1},
 	},
 	/* 16 */
 	{
-		x: gf.GF255s { 0x492AFE097556579D, 0x13B540A021705957,
-		               0xFDFA5CC01C264FF7, 0x1053932D99A6BBCD },
-		u: gf.GF255s { 0xA0A662EF07947CAE, 0xCFD4B9B4407ADF90,
-		               0x9698A42E4CDA26D4, 0x00D98818FA1C5F43 },
+		x: gf.GF255s{0x492AFE097556579D, 0x13B540A021705957,
+			0xFDFA5CC01C264FF7, 0x1053932D99A6BBCD},
+		u: gf.GF255s{0xA0A662EF07947CAE, 0xCFD4B9B4407ADF90,
+			0x9698A42E4CDA26D4, 0x00D98818FA1C5F43},
 	},
 }
 
-var do255sWin_G130_xu = [16]do255sPointAffine {
+var do255sWin_G130_xu = [16]do255sPointAffine{
 	/* 1 */
 	{
-		x: gf.GF255s { 0xD9AB2AB4313E150A, 0xAF3680D8923D8F48,
-		               0x8FE12E041CE8DFAF, 0x254561A8AEB11CAB },
-		u: gf.GF255s { 0xC17AB82D247C18A0, 0x95542A3E6973F13C,
-		               0xB14CDFC79E957BD2, 0x661229C7BADE4F32 },
+		x: gf.GF255s{0xD9AB2AB4313E150A, 0xAF3680D8923D8F48,
+			0x8FE12E041CE8DFAF, 0x254561A8AEB11CAB},
+		u: gf.GF255s{0xC17AB82D247C18A0, 0x95542A3E6973F13C,
+			0xB14CDFC79E957BD2, 0x661229C7BADE4F32},
 	},
 	/* 2 */
 	{
-		x: gf.GF255s { 0x9C35A5637F6C8053, 0x5706387FD6021602,
-		               0x0AF3C1470C1697F6, 0x7847E5A5A7420D24 },
-		u: gf.GF255s { 0x72C27DF187129578, 0xF443CA1C94A3CAEB,
-		               0xEA24368F35C3A22D, 0x17A619CA7283DADF },
+		x: gf.GF255s{0x9C35A5637F6C8053, 0x5706387FD6021602,
+			0x0AF3C1470C1697F6, 0x7847E5A5A7420D24},
+		u: gf.GF255s{0x72C27DF187129578, 0xF443CA1C94A3CAEB,
+			0xEA24368F35C3A22D, 0x17A619CA7283DADF},
 	},
 	/* 3 */
 	{
-		x: gf.GF255s { 0xFCB2125561D1D07F, 0x75909948DD63D9AC,
-		               0x423F60D1CF853002, 0x7CA49E6CC1F4B430 },
-		u: gf.GF255s { 0x31D729A12CB400ED, 0x7A195520CEEAA6A9,
-		               0x86F51D53192BE4B6, 0x22A23BF61CDCF306 },
+		x: gf.GF255s{0xFCB2125561D1D07F, 0x75909948DD63D9AC,
+			0x423F60D1CF853002, 0x7CA49E6CC1F4B430},
+		u: gf.GF255s{0x31D729A12CB400ED, 0x7A195520CEEAA6A9,
+			0x86F51D53192BE4B6, 0x22A23BF61CDCF306},
 	},
 	/* 4 */
 	{
-		x: gf.GF255s { 0xF4E0408E636E5ABA, 0x9CD7416D582A44FA,
-		               0x942DC6F5FEA2C3C6, 0x157D068AE6F5A315 },
-		u: gf.GF255s { 0x767FEA8208A28FA3, 0xA2DC84A037DCA7EE,
-		               0xEBD2AC8233E1DE6F, 0x188F708521AD21CA },
+		x: gf.GF255s{0xF4E0408E636E5ABA, 0x9CD7416D582A44FA,
+			0x942DC6F5FEA2C3C6, 0x157D068AE6F5A315},
+		u: gf.GF255s{0x767FEA8208A28FA3, 0xA2DC84A037DCA7EE,
+			0xEBD2AC8233E1DE6F, 0x188F708521AD21CA},
 	},
 	/* 5 */
 	{
-		x: gf.GF255s { 0x5AC5803793462B8A, 0x1260408E42FAD501,
-		               0x04E6353CE57B6118, 0x2EC28A315514EE0D },
-		u: gf.GF255s { 0xB820181764875239, 0x5B4DD1BB342A7459,
-		               0xC66B48D80BE03B56, 0x7F08F18F636EA208 },
+		x: gf.GF255s{0x5AC5803793462B8A, 0x1260408E42FAD501,
+			0x04E6353CE57B6118, 0x2EC28A315514EE0D},
+		u: gf.GF255s{0xB820181764875239, 0x5B4DD1BB342A7459,
+			0xC66B48D80BE03B56, 0x7F08F18F636EA208},
 	},
 	/* 6 */
 	{
-		x: gf.GF255s { 0xE3AB9795E746B94F, 0x838E9EFFD0E5D4BB,
-		               0xBF8C188E36E0B9CB, 0x22F1F02E91674AD5 },
-		u: gf.GF255s { 0x9FFA28B92E2ECC30, 0xFB480B5678DA5C00,
-		               0xE1C94F9AB14804D7, 0x7D453CC948C9FA1D },
+		x: gf.GF255s{0xE3AB9795E746B94F, 0x838E9EFFD0E5D4BB,
+			0xBF8C188E36E0B9CB, 0x22F1F02E91674AD5},
+		u: gf.GF255s{0x9FFA28B92E2ECC30, 0xFB480B5678DA5C00,
+			0xE1C94F9AB14804D7, 0x7D453CC948C9FA1D},
 	},
 	/* 7 */
 	{
-		x: gf.GF255s { 0xC6E25DCD6722A7DB, 0x41174D150E1112E4,
-		               0x3E4484A32C15C12C, 0x58FBCE703CBFCC0E },
-		u: gf.GF255s { 0x8784811955F5DEF5, 0x48D2662133271AC2,
-		               0xAF3F2A3FA6C81237, 0x1A086A6FE01B2E7D },
+		x: gf.GF255s{0xC6E25DCD6722A7DB, 0x41174D150E1112E4,
+			0x3E4484A32C15C12C, 0x58FBCE703CBFCC0E},
+		u: gf.GF255s{0x8784811955F5DEF5, 0x48D2662133271AC2,
+			0xAF3F2A3FA6C81237, 0x1A086A6FE01B2E7D},
 	},
 	/* 8 */
 	{
-		x: gf.GF255s { 0x76867E220E1C7387, 0x6876C29D05E6E1C0,
-		               0xBFD4B391E87110E1, 0x613A84AA71E6E57F },
-		u: gf.GF255s { 0x1DC9A2A859DBD92B, 0xBF15C84C6245BBB3,
-		               0x2A8D65D0B2CAB143, 0x3DE43A8017A5525E },
+		x: gf.GF255s{0x76867E220E1C7387, 0x6876C29D05E6E1C0,
+			0xBFD4B391E87110E1, 0x613A84AA71E6E57F},
+		u: gf.GF255s{0x1DC9A2A859DBD92B, 0xBF15C84C6245BBB3,
+			0x2A8D65D0B2CAB143, 0x3DE43A8017A5525E},
 	},
 	/* 9 */
 	{
-		x: gf.GF255s { 0x897F189BF41FA232, 0x31DC1F6609C0B63D,
-		               0x8F33869EB9BECA07, 0x6314FEF02F399003 },
-		u: gf.GF255s { 0xDB52105D891C8CF1, 0xA1E811D5F01D372F,
-		               0x5CF867DE0ADED951, 0x17052800E0B4DA8B },
+		x: gf.GF255s{0x897F189BF41FA232, 0x31DC1F6609C0B63D,
+			0x8F33869EB9BECA07, 0x6314FEF02F399003},
+		u: gf.GF255s{0xDB52105D891C8CF1, 0xA1E811D5F01D372F,
+			0x5CF867DE0ADED951, 0x17052800E0B4DA8B},
 	},
 	/* 10 */
 	{
-		x: gf.GF255s { 0x2D9B581DC5B282B0, 0xDA006B6A93A610DE,
-		               0xFECD738894842EB5, 0x209F00E9867FED68 },
-		u: gf.GF255s { 0x126C847746496B31, 0x23D37316626487D7,
-		               0x46505E02982B39EB, 0x234345752143582E },
+		x: gf.GF255s{0x2D9B581DC5B282B0, 0xDA006B6A93A610DE,
+			0xFECD738894842EB5, 0x209F00E9867FED68},
+		u: gf.GF255s{0x126C847746496B31, 0x23D37316626487D7,
+			0x46505E02982B39EB, 0x234345752143582E},
 	},
 	/* 11 */
 	{
-		x: gf.GF255s { 0x011BE82B2CE8661D, 0xB271BF01FFE6A835,
-		               0x58CA42537E335CBA, 0x55DE7CA1C28EC9D8 },
-		u: gf.GF255s { 0xD51EDD52BECE2651, 0x792F3E2ED6FA4957,
-		               0x8349ED268E6F750E, 0x6BB94CDFEF6F6D88 },
+		x: gf.GF255s{0x011BE82B2CE8661D, 0xB271BF01FFE6A835,
+			0x58CA42537E335CBA, 0x55DE7CA1C28EC9D8},
+		u: gf.GF255s{0xD51EDD52BECE2651, 0x792F3E2ED6FA4957,
+			0x8349ED268E6F750E, 0x6BB94CDFEF6F6D88},
 	},
 	/* 12 */
 	{
-		x: gf.GF255s { 0x38933FA3CD39261E, 0x3C3AF9A02BA7FB63,
-		               0x28F0D9086ECFFB4C, 0x7337FC83C49CEF8B },
-		u: gf.GF255s { 0x89340045DE2129A6, 0x10CF7923E46000DB,
-		               0xA17D1BEB2C69ABE2, 0x1F3592DE203C2DA4 },
+		x: gf.GF255s{0x38933FA3CD39261E, 0x3C3AF9A02BA7FB63,
+			0x28F0D9086ECFFB4C, 0x7337FC83C49CEF8B},
+		u: gf.GF255s{0x89340045DE2129A6, 0x10CF7923E46000DB,
+			0xA17D1BEB2C69ABE2, 0x1F3592DE203C2DA4},
 	},
 	/* 13 */
 	{
-		x: gf.GF255s { 0x4CD4A2285435BD02, 0x44E5A2A8E9FCB255,
-		               0x80DD71B6AD674422, 0x1B1EC39B8DDC6546 },
-		u: gf.GF255s { 0x0F4767AD57355C90, 0xCAD900D819124EA8,
-		               0xB4B045E5E702318A, 0x7AB6CB353A7E1058 },
+		x: gf.GF255s{0x4CD4A2285435BD02, 0x44E5A2A8E9FCB255,
+			0x80DD71B6AD674422, 0x1B1EC39B8DDC6546},
+		u: gf.GF255s{0x0F4767AD57355C90, 0xCAD900D819124EA8,
+			0xB4B045E5E702318A, 0x7AB6CB353A7E1058},
 	},
 	/* 14 */
 	{
-		x: gf.GF255s { 0xC42905109B1A192C, 0x8D33854826E55283,
-		               0xAA6FD4F2FA9558A9, 0x35F24A95D568423A },
-		u: gf.GF255s { 0xE62B26D301A95CF8, 0x84BC9EEC48398A95,
-		               0x08F76F6E267875A4, 0x32D3B1A49A0A50A1 },
+		x: gf.GF255s{0xC42905109B1A192C, 0x8D33854826E55283,
+			0xAA6FD4F2FA9558A9, 0x35F24A95D568423A},
+		u: gf.GF255s{0xE62B26D301A95CF8, 0x84BC9EEC48398A95,
+			0x08F76F6E267875A4, 0x32D3B1A49A0A50A1},
 	},
 	/* 15 */
 	{
-		x: gf.GF255s { 0x63F85CD360842C43, 0xB125F90D87643CE9,
-		               0xC9FCE0470F0D206F, 0x1C7E6FBE705B59B8 },
-		u: gf.GF255s { 0x9A0B63FF58819185, 0xF789BF221086D125,
-		               0xAD341ED8B1E1776A, 0x082617E146EBF733 },
+		x: gf.GF255s{0x63F85CD360842C43, 0xB125F90D87643CE9,
+			0xC9FCE0470F0D206F, 0x1C7E6FBE705B59B8},
+		u: gf.GF255s{0x9A0B63FF58819185, 0xF789BF221086D125,
+			0xAD341ED8B1E1776A, 0x082617E146EBF733},
 	},
 	/* 16 */
 	{
-		x: gf.GF255s { 0xB0C3DE6BEBEAEC95, 0x4D695AB6C0E9A3E4,
-		               0x0CA501DA9EAD2ACA, 0x7402B1938309B1CC },
-		u: gf.GF255s { 0xF50D8973C1409964, 0x7E7D988FECBBDB1D,
-		               0x64BAB1680DE07B83, 0x588C179EE277A32E },
+		x: gf.GF255s{0xB0C3DE6BEBEAEC95, 0x4D695AB6C0E9A3E4,
+			0x0CA501DA9EAD2ACA, 0x7402B1938309B1CC},
+		u: gf.GF255s{0xF50D8973C1409964, 0x7E7D988FECBBDB1D,
+			0x64BAB1680DE07B83, 0x588C179EE277A32E},
 	},
 }
 
-var do255sWin_G195_xu = [16]do255sPointAffine {
+var do255sWin_G195_xu = [16]do255sPointAffine{
 	/* 1 */
 	{
-		x: gf.GF255s { 0xA5B332AE8B607110, 0xC6A1F5888C5C2A7B,
-		               0x4686BCEF5F176F78, 0x2EEA2C710771051D },
-		u: gf.GF255s { 0xD5386C024F6950E1, 0xB46F6A19F2C711D7,
-		               0xD13612F77F90F84F, 0x02B1FE40C35B1108 },
+		x: gf.GF255s{0xA5B332AE8B607110, 0xC6A1F5888C5C2A7B,
+			0x4686BCEF5F176F78, 0x2EEA2C710771051D},
+		u: gf.GF255s{0xD5386C024F6950E1, 0xB46F6A19F2C711D7,
+			0xD13612F77F90F84F, 0x02B1FE40C35B1108},
 	},
 	/* 2 */
 	{
-		x: gf.GF255s { 0xD08B3673DD36C5D6, 0x42875443DFF50CA5,
-		               0x4472B3B100AD977A, 0x71BBE2F8AAAD796C },
-		u: gf.GF255s { 0x4D20522801D9BE69, 0x491F6D9530005684,
-		               0x0394879561348B5B, 0x207807A3C7DA4C9E },
+		x: gf.GF255s{0xD08B3673DD36C5D6, 0x42875443DFF50CA5,
+			0x4472B3B100AD977A, 0x71BBE2F8AAAD796C},
+		u: gf.GF255s{0x4D20522801D9BE69, 0x491F6D9530005684,
+			0x0394879561348B5B, 0x207807A3C7DA4C9E},
 	},
 	/* 3 */
 	{
-		x: gf.GF255s { 0x91F7BAAD9ECAFD0C, 0xDF7832A52AEBB19D,
-		               0x72D70D6D53A736B8, 0x4053B80041C9765F },
-		u: gf.GF255s { 0x62329BF642399CCB, 0xD15830A754BDD8E5,
-		               0x052C83B745F76715, 0x2C2FEC4277A075E5 },
+		x: gf.GF255s{0x91F7BAAD9ECAFD0C, 0xDF7832A52AEBB19D,
+			0x72D70D6D53A736B8, 0x4053B80041C9765F},
+		u: gf.GF255s{0x62329BF642399CCB, 0xD15830A754BDD8E5,
+			0x052C83B745F76715, 0x2C2FEC4277A075E5},
 	},
 	/* 4 */
 	{
-		x: gf.GF255s { 0x8CFBE62352C0321C, 0x35317478163A7506,
-		               0xB07FB5CF2F0D350C, 0x674624CC5B63BEAB },
-		u: gf.GF255s { 0x33F1C936823F9793, 0x45EB4CD78646E9E2,
-		               0xB28C3C8D49110514, 0x20B293F739F3AA65 },
+		x: gf.GF255s{0x8CFBE62352C0321C, 0x35317478163A7506,
+			0xB07FB5CF2F0D350C, 0x674624CC5B63BEAB},
+		u: gf.GF255s{0x33F1C936823F9793, 0x45EB4CD78646E9E2,
+			0xB28C3C8D49110514, 0x20B293F739F3AA65},
 	},
 	/* 5 */
 	{
-		x: gf.GF255s { 0x0EFD79AE51CFE627, 0x8D6F3A49D66034F7,
-		               0x4D2C2C01A87347FE, 0x380D6B9FEB08A3F5 },
-		u: gf.GF255s { 0x3F09E8FE4D4F0DAA, 0xE47EE2E2B553CA96,
-		               0x9FFA3C3AAC578533, 0x356B0675A08113C1 },
+		x: gf.GF255s{0x0EFD79AE51CFE627, 0x8D6F3A49D66034F7,
+			0x4D2C2C01A87347FE, 0x380D6B9FEB08A3F5},
+		u: gf.GF255s{0x3F09E8FE4D4F0DAA, 0xE47EE2E2B553CA96,
+			0x9FFA3C3AAC578533, 0x356B0675A08113C1},
 	},
 	/* 6 */
 	{
-		x: gf.GF255s { 0xD179D52E0F60ECF2, 0x98C18C7C19CE5942,
-		               0xAC43B21539169363, 0x373829F1D540D16F },
-		u: gf.GF255s { 0xA143C257C8E7B387, 0x62D889136CC108D4,
-		               0xE32F52E0BB72837C, 0x076CCDEE12F67001 },
+		x: gf.GF255s{0xD179D52E0F60ECF2, 0x98C18C7C19CE5942,
+			0xAC43B21539169363, 0x373829F1D540D16F},
+		u: gf.GF255s{0xA143C257C8E7B387, 0x62D889136CC108D4,
+			0xE32F52E0BB72837C, 0x076CCDEE12F67001},
 	},
 	/* 7 */
 	{
-		x: gf.GF255s { 0x88F2BF91C052AA4C, 0xBD6C284630F6316B,
-		               0xA916918E68DB91DB, 0x29BAD78DBC302139 },
-		u: gf.GF255s { 0x971F761E8AEDB101, 0xD10EB0D73B802862,
-		               0x100B543BDE5AD3F6, 0x2D2D355F27445B8E },
+		x: gf.GF255s{0x88F2BF91C052AA4C, 0xBD6C284630F6316B,
+			0xA916918E68DB91DB, 0x29BAD78DBC302139},
+		u: gf.GF255s{0x971F761E8AEDB101, 0xD10EB0D73B802862,
+			0x100B543BDE5AD3F6, 0x2D2D355F27445B8E},
 	},
 	/* 8 */
 	{
-		x: gf.GF255s { 0xEFF0E12764994499, 0xE0F075AC08336324,
-		               0xEE9F6C3330900A58, 0x12CFF18E3B68E16E },
-		u: gf.GF255s { 0x6AC9953979CB6EA2, 0xB754075F43904E3A,
-		               0x0F5C5D706C51FC54, 0x72F0811D6A945237 },
+		x: gf.GF255s{0xEFF0E12764994499, 0xE0F075AC08336324,
+			0xEE9F6C3330900A58, 0x12CFF18E3B68E16E},
+		u: gf.GF255s{0x6AC9953979CB6EA2, 0xB754075F43904E3A,
+			0x0F5C5D706C51FC54, 0x72F0811D6A945237},
 	},
 	/* 9 */
 	{
-		x: gf.GF255s { 0x3B36DDD303A56217, 0x56B840E1E5485F22,
-		               0xE35974691ED67A31, 0x14D0AD4AA2B7708D },
-		u: gf.GF255s { 0xF2B5C06FCAFEB583, 0x2D0EFBE6A1A2C97B,
-		               0x466067CE1442F46D, 0x13349ABFC999DD67 },
+		x: gf.GF255s{0x3B36DDD303A56217, 0x56B840E1E5485F22,
+			0xE35974691ED67A31, 0x14D0AD4AA2B7708D},
+		u: gf.GF255s{0xF2B5C06FCAFEB583, 0x2D0EFBE6A1A2C97B,
+			0x466067CE1442F46D, 0x13349ABFC999DD67},
 	},
 	/* 10 */
 	{
-		x: gf.GF255s { 0x1487FE1D0AAD152B, 0xD389875D9B57CB58,
-		               0x00086A583427927B, 0x10FD1E1939F33683 },
-		u: gf.GF255s { 0x1F87C746453A8A8A, 0xDDCF1D005DA27586,
-		               0xC77308C7C7664BF3, 0x5774724E6436D94B },
+		x: gf.GF255s{0x1487FE1D0AAD152B, 0xD389875D9B57CB58,
+			0x00086A583427927B, 0x10FD1E1939F33683},
+		u: gf.GF255s{0x1F87C746453A8A8A, 0xDDCF1D005DA27586,
+			0xC77308C7C7664BF3, 0x5774724E6436D94B},
 	},
 	/* 11 */
 	{
-		x: gf.GF255s { 0xBA92EB23B8AB9BE1, 0x369244277FDE0909,
-		               0x603EBECE9890D5AD, 0x640E212BBA557898 },
-		u: gf.GF255s { 0x08A8CB0C9987EBED, 0x05428BBDC4D7168A,
-		               0x5FDD560F0207E6AA, 0x4CD603F72497FC6D },
+		x: gf.GF255s{0xBA92EB23B8AB9BE1, 0x369244277FDE0909,
+			0x603EBECE9890D5AD, 0x640E212BBA557898},
+		u: gf.GF255s{0x08A8CB0C9987EBED, 0x05428BBDC4D7168A,
+			0x5FDD560F0207E6AA, 0x4CD603F72497FC6D},
 	},
 	/* 12 */
 	{
-		x: gf.GF255s { 0x0B9FCE4299AFD948, 0x7CA4BCD2EAA2E0EC,
-		               0xE3FA30C5AC388BA7, 0x606DBE6798462842 },
-		u: gf.GF255s { 0xB4754DE27F72D537, 0xC0F01E802AC5B1C3,
-		               0x6492E0F04B64FC09, 0x14C0F255E1CDCAD1 },
+		x: gf.GF255s{0x0B9FCE4299AFD948, 0x7CA4BCD2EAA2E0EC,
+			0xE3FA30C5AC388BA7, 0x606DBE6798462842},
+		u: gf.GF255s{0xB4754DE27F72D537, 0xC0F01E802AC5B1C3,
+			0x6492E0F04B64FC09, 0x14C0F255E1CDCAD1},
 	},
 	/* 13 */
 	{
-		x: gf.GF255s { 0x8C25E45F7D80CA97, 0xCC8CB15146620FFB,
-		               0xA4ECCCCE54B3AA7D, 0x5725DEC68B4D2C1D },
-		u: gf.GF255s { 0xCF158917F580DF1C, 0x0E14A880D3E90C45,
-		               0x60D780AFF882B1C7, 0x420C0614ED165A4B },
+		x: gf.GF255s{0x8C25E45F7D80CA97, 0xCC8CB15146620FFB,
+			0xA4ECCCCE54B3AA7D, 0x5725DEC68B4D2C1D},
+		u: gf.GF255s{0xCF158917F580DF1C, 0x0E14A880D3E90C45,
+			0x60D780AFF882B1C7, 0x420C0614ED165A4B},
 	},
 	/* 14 */
 	{
-		x: gf.GF255s { 0x277645546DA86DED, 0x0306A489B4168BAF,
-		               0x70DC32CE22762D79, 0x49450B2E315499A1 },
-		u: gf.GF255s { 0xE3DF626AA182F658, 0x0AEB0A55D410C765,
-		               0x645809F39DD03BA1, 0x40C860215AE057DB },
+		x: gf.GF255s{0x277645546DA86DED, 0x0306A489B4168BAF,
+			0x70DC32CE22762D79, 0x49450B2E315499A1},
+		u: gf.GF255s{0xE3DF626AA182F658, 0x0AEB0A55D410C765,
+			0x645809F39DD03BA1, 0x40C860215AE057DB},
 	},
 	/* 15 */
 	{
-		x: gf.GF255s { 0x7BBF7B434F5F8ED2, 0x41BAB11E135E5808,
-		               0x666BECEDBDB00CD1, 0x5E6B345CAD1A0A15 },
-		u: gf.GF255s { 0xBA4D3B438436B829, 0xFD932027B0906610,
-		               0x43EFF53756D1C683, 0x0C078789FF8301C5 },
+		x: gf.GF255s{0x7BBF7B434F5F8ED2, 0x41BAB11E135E5808,
+			0x666BECEDBDB00CD1, 0x5E6B345CAD1A0A15},
+		u: gf.GF255s{0xBA4D3B438436B829, 0xFD932027B0906610,
+			0x43EFF53756D1C683, 0x0C078789FF8301C5},
 	},
 	/* 16 */
 	{
-		x: gf.GF255s { 0x3AC75F22F410E610, 0xC5752B476401C98F,
-		               0x1B6F4E6E58028B0B, 0x794FB7F20AF770CB },
-		u: gf.GF255s { 0x2C94910518A991C5, 0xAAC1F71E18F00C14,
-		               0x2E1D217E9768A122, 0x50A69209BB0B3E0B },
+		x: gf.GF255s{0x3AC75F22F410E610, 0xC5752B476401C98F,
+			0x1B6F4E6E58028B0B, 0x794FB7F20AF770CB},
+		u: gf.GF255s{0x2C94910518A991C5, 0xAAC1F71E18F00C14,
+			0x2E1D217E9768A122, 0x50A69209BB0B3E0B},
 	},
 }

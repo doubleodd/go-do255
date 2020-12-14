@@ -1,8 +1,8 @@
 package scalar
 
 import (
-	"math/bits"
 	"encoding/binary"
+	"math/bits"
 )
 
 // This file contains some helper functions that are used by implementations
@@ -19,8 +19,8 @@ import (
 // enough), and the sub-slice where data should be written.
 // (Inspired by https://github.com/gtank/ristretto255 )
 func prepareAppend(b []byte, n int) (head, tail []byte) {
-	len1 := len(b)    // current length
-	len2 := len1 + n  // new length after extension
+	len1 := len(b)   // current length
+	len2 := len1 + n // new length after extension
 	if cap(b) >= len2 {
 		head = b[:len2]
 	} else {
@@ -34,7 +34,7 @@ func prepareAppend(b []byte, n int) (head, tail []byte) {
 // 128x128->128 multiplication.
 func Mul128x128trunc(d, a, b *[2]uint64) {
 	t1, t0 := bits.Mul64(a[0], b[0])
-	t1 += a[0] * b[1] + a[1] * b[0]
+	t1 += a[0]*b[1] + a[1]*b[0]
 	d[0] = t0
 	d[1] = t1
 }
@@ -102,8 +102,8 @@ func Mul256x256(d *[8]uint64, a *[4]uint64, b *[4]uint64) {
 // On error, output value (in d[]) is forced to zero.
 func Decode(d *[4]uint64, src []byte, r *[4]uint64) int {
 	// Decode in little-endian.
-	for i := 0; i < 4; i ++ {
-		d[i] = binary.LittleEndian.Uint64(src[8 * i:])
+	for i := 0; i < 4; i++ {
+		d[i] = binary.LittleEndian.Uint64(src[8*i:])
 	}
 
 	// Check whether all bytes were zero.
@@ -113,10 +113,10 @@ func Decode(d *[4]uint64, src []byte, r *[4]uint64) int {
 	// Compare value with r; if not lower (borrow is zero), then
 	// this is invalid.
 	var cc uint64 = 0
-	for i := 0; i < 4; i ++ {
+	for i := 0; i < 4; i++ {
 		_, cc = bits.Sub64(d[i], r[i], cc)
 	}
-	for i := 0; i < 4; i ++ {
+	for i := 0; i < 4; i++ {
 		d[i] &= -cc
 	}
 
@@ -142,8 +142,8 @@ func Encode(b []byte, s *[4]uint64, rf Reduce256) []byte {
 	b2, dst := prepareAppend(b, 32)
 	var t [4]uint64
 	rf(&t, s)
-	for i := 0; i < 4; i ++ {
-		binary.LittleEndian.PutUint64(dst[8 * i:], t[i])
+	for i := 0; i < 4; i++ {
+		binary.LittleEndian.PutUint64(dst[8*i:], t[i])
 	}
 	return b2
 }
@@ -166,7 +166,7 @@ func DecodeReduce(d *[4]uint64, src []byte, rf Reduce384) {
 	n := len(src)
 
 	// Set output to 0.
-	for i := 0; i < 4; i ++ {
+	for i := 0; i < 4; i++ {
 		d[i] = 0
 	}
 
@@ -187,8 +187,8 @@ func DecodeReduce(d *[4]uint64, src []byte, rf Reduce384) {
 	} else {
 		j = 0
 	}
-	for i := 0; i < (n - j); i ++ {
-		d[i >> 3] |= uint64(src[j + i]) << uint((i & 7) << 3)
+	for i := 0; i < (n - j); i++ {
+		d[i>>3] |= uint64(src[j+i]) << uint((i&7)<<3)
 	}
 
 	// For all remaining chunks of 16 bytes, multiply the current
@@ -198,7 +198,7 @@ func DecodeReduce(d *[4]uint64, src []byte, rf Reduce384) {
 		j -= 16
 		var t [6]uint64
 		t[0] = binary.LittleEndian.Uint64(src[j:])
-		t[1] = binary.LittleEndian.Uint64(src[j + 8:])
+		t[1] = binary.LittleEndian.Uint64(src[j+8:])
 		copy(t[2:], d[:])
 		rf(d, &t)
 	}
@@ -211,7 +211,7 @@ func Add(d, a, b *[4]uint64, rf Reduce256) {
 	rf(&t1, a)
 	rf(&t2, b)
 	var cc uint64 = 0
-	for i := 0; i < 4; i ++ {
+	for i := 0; i < 4; i++ {
 		d[i], cc = bits.Add64(t1[i], t2[i], cc)
 	}
 	// No output carry is possible, since both inputs were reduced
@@ -228,7 +228,7 @@ func Sub(d, a, b *[4]uint64, rf Reduce256, r *[4]uint64) {
 
 	// Perform subtraction.
 	var cc uint64 = 0
-	for i := 0; i < 4; i ++ {
+	for i := 0; i < 4; i++ {
 		d[i], cc = bits.Sub64(a[i], t2[i], cc)
 	}
 
@@ -241,7 +241,7 @@ func Sub(d, a, b *[4]uint64, rf Reduce256, r *[4]uint64) {
 	r2[2] = -cc & ((r[2] << 1) | (r[1] >> 63))
 	r2[3] = -cc & ((r[3] << 1) | (r[2] >> 63))
 	cc = 0
-	for i := 0; i < 4; i ++ {
+	for i := 0; i < 4; i++ {
 		d[i], cc = bits.Add64(d[i], r2[i], cc)
 	}
 }
@@ -274,13 +274,13 @@ func Recode5(d *[52]byte, a *[4]uint64) {
 	acc_len := 64
 	j := 1
 	var cc uint = 0
-	for i := 0; i < 51; i ++ {
+	for i := 0; i < 51; i++ {
 		var b uint
 		if acc_len < 5 {
 			next := a[j]
-			j ++
-			b = uint(acc | (next << uint(acc_len))) & 31
-			acc = next >> uint(5 - acc_len)
+			j++
+			b = uint(acc|(next<<uint(acc_len))) & 31
+			acc = next >> uint(5-acc_len)
 			acc_len = 59 + acc_len
 		} else {
 			b = uint(acc) & 31
@@ -303,7 +303,7 @@ func Recode5Small(d *[26]byte, k *[2]uint64) {
 	// First 12 digits from the low limb.
 	var db uint64 = 0
 	t := k[0]
-	for i := 0; i < 12; i ++ {
+	for i := 0; i < 12; i++ {
 		b := (t & 0x1F) + db
 		m := (16 - b) >> 8
 		b ^= m & (b ^ (160 - b))
@@ -314,7 +314,7 @@ func Recode5Small(d *[26]byte, k *[2]uint64) {
 
 	// Get more bits from the high limb for the next 12 digits.
 	t |= k[1] << 4
-	for i := 12; i < 24; i ++ {
+	for i := 12; i < 24; i++ {
 		b := (t & 0x1F) + db
 		m := (16 - b) >> 8
 		b ^= m & (b ^ (160 - b))
@@ -342,13 +342,13 @@ func Recode5Small(d *[26]byte, k *[2]uint64) {
 func Recode5SmallSigned(d *[26]byte, k *[2]uint64) uint64 {
 	// Compute abs(k) (in x0:x1) and record its sign (in sk).
 	sk := k[1] >> 63
-	x0, cc := bits.Add64(k[0] ^ -sk, sk, 0)
+	x0, cc := bits.Add64(k[0]^-sk, sk, 0)
 	x1 := (k[1] ^ -sk) + cc
 
 	// First 12 digits from the low limb.
 	var db uint64 = 0
 	t := x0
-	for i := 0; i < 12; i ++ {
+	for i := 0; i < 12; i++ {
 		b := (t & 0x1F) + db
 		m := (16 - b) >> 8
 		b ^= m & (b ^ (160 - b))
@@ -359,7 +359,7 @@ func Recode5SmallSigned(d *[26]byte, k *[2]uint64) uint64 {
 
 	// Get more bits from the high limb for the next 12 digits.
 	t |= x1 << 4
-	for i := 12; i < 24; i ++ {
+	for i := 12; i < 24; i++ {
 		b := (t & 0x1F) + db
 		m := (16 - b) >> 8
 		b ^= m & (b ^ (160 - b))

@@ -1,10 +1,10 @@
 package do255s
 
 import (
-	"fmt"
-	"math/big"
 	"crypto/sha512"
 	"encoding/binary"
+	"fmt"
+	"math/big"
 )
 
 // =====================================================================
@@ -36,7 +36,7 @@ func (p *prng) generate(d []byte) {
 		if c > n {
 			c = n
 		}
-		copy(d, p.buf[p.ptr : p.ptr + c])
+		copy(d, p.buf[p.ptr:p.ptr+c])
 		d = d[c:]
 		n -= c
 		p.ptr += c
@@ -47,8 +47,8 @@ func (p *prng) generate(d []byte) {
 func (p *prng) mk256(d *[4]uint64) {
 	var bb [32]byte
 	p.generate(bb[:])
-	for i := 0; i < 4; i ++ {
-		d[i] = binary.LittleEndian.Uint64(bb[8 * i:])
+	for i := 0; i < 4; i++ {
+		d[i] = binary.LittleEndian.Uint64(bb[8*i:])
 	}
 }
 
@@ -56,7 +56,7 @@ func (p *prng) mk256(d *[4]uint64) {
 // modulo m.
 func int256ToBigMod(a *[4]uint64, m *big.Int) big.Int {
 	var x, y big.Int
-	for i := 3; i >= 0; i -- {
+	for i := 3; i >= 0; i-- {
 		y.SetUint64(a[i])
 		x.Lsh(&x, 64).Add(&x, &y)
 	}

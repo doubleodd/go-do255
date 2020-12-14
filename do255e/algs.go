@@ -1,12 +1,12 @@
 package do255e
 
 import (
-	"errors"
-	"io"
-	"encoding/binary"
 	"crypto"
 	cryptorand "crypto/rand"
+	"encoding/binary"
+	"errors"
 	"golang.org/x/crypto/sha3"
+	"io"
 )
 
 // This file implements high-level operations over do255e:
@@ -20,14 +20,14 @@ import (
 // scalar for do255e. For efficiency reasons, it internally caches a
 // copy of the public key as well.
 type Do255ePrivateKey struct {
-	d Do255eScalar
-	pub Do255ePoint
+	d    Do255eScalar
+	pub  Do255ePoint
 	epub [32]byte
 }
 
 // A public key structure contains a non-neutral group element.
 type Do255ePublicKey struct {
-	pub Do255ePoint
+	pub  Do255ePoint
 	epub [32]byte
 }
 
@@ -38,7 +38,7 @@ func (pk Do255ePublicKey) Equal(other crypto.PublicKey) bool {
 		return false
 	}
 	var t byte = 0
-	for i := 0; i < 32; i ++ {
+	for i := 0; i < 32; i++ {
 		t |= pk.epub[i] ^ pk2.epub[i]
 	}
 	return t == 0
@@ -201,15 +201,15 @@ func Do255eKeyExchange(sk *Do255ePrivateKey, peer_pk []byte, secretLen int) (sec
 	// bb[1..32] is either the shared point, or our own private key.
 	P2.EncodeSquaredW(bb[1:1])
 	sk.Encode(esk[:0])
-	for i := 0; i < 32; i ++ {
-		bb[1 + i] ^= bb[0] & (bb[1 + i] ^ esk[i])
+	for i := 0; i < 32; i++ {
+		bb[1+i] ^= bb[0] & (bb[1+i] ^ esk[i])
 	}
 	sh.Write(bb[:])
 
 	// Get the two public keys in numerical order. Our public key is
 	// in sk.epub; the peer public key is in eppk.
 	var cc uint = 0
-	for i := 0; i < 32; i ++ {
+	for i := 0; i < 32; i++ {
 		x := uint(sk.epub[i]) - uint(eppk[i]) - cc
 		cc = (x >> 8) & 1
 	}
@@ -217,9 +217,9 @@ func Do255eKeyExchange(sk *Do255ePrivateKey, peer_pk []byte, secretLen int) (sec
 	// sk.epub >= eppk.
 	var bb2 [64]byte
 	m := byte(-cc)
-	for i := 0; i < 32; i ++ {
+	for i := 0; i < 32; i++ {
 		bb2[i] = (sk.epub[i] & m) | (eppk[i] & ^m)
-		bb2[32 + i] = (sk.epub[i] & ^m) | (eppk[i] & m)
+		bb2[32+i] = (sk.epub[i] & ^m) | (eppk[i] & m)
 	}
 	sh.Write(bb2[:])
 
